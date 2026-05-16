@@ -21,5 +21,7 @@ namespace karaaslanlar1.Models
 
         [Display(Name = "Başvuru Tarihi")]
         public DateTime BasvuruTarihi { get; set; } = DateTime.Now;
+        // Varsayılan olarak false gelir, admin onaylayınca true yapacağız
+        public bool IsApproved { get; set; } = false;
     }
 }

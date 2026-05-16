@@ -143,3 +143,44 @@ body.dark-mode {
     body.dark-mode .table-hover > tbody > tr:hover {
         background-color: rgba(255, 255, 255, 0.06) !important;
     }
+@keyframes logoPulse {
+
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.7);
+    }
+
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 8px rgba(225, 29, 72, 0);
+    }
+
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(225, 29, 72, 0);
+    }
+}
+
+.opacity-hover:hover {
+    color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+#themeToggleBtn:hover {
+    transform: scale(1.1) rotate(15deg);
+}
+
+body:not(.dark-mode) #themeToggleBtn {
+    background-color: #1e1e1e !important;
+}
+
+body.dark-mode #themeToggleBtn {
+    background-color: #ffc107 !important;
+    border-color: #ffca28 !important;
+    color: #000000 !important;
+}
+
+.form-select option {
+    background-color: #131c2e;
+    color: #ffffff;
+}

@@ -1,0 +1,106 @@
+﻿@model IEnumerable<karaaslanlar1.Models.GonulluBasvuru>
+
+@{
+    ViewData["Title"] = "Gönüllü Operasyon Yönetimi";
+    var bekleyenler = Model?.Where(g => !g.IsApproved).ToList();
+    var onaylananlar = Model?.Where(g => g.IsApproved).ToList();
+}
+
+<div class="d-flex justify-content-between align-items-center mt-4 mb-4">
+    <h2 class="fw-bold text-dark mb-0">👥 Gönüllü Operasyon Yönetim Paneli</h2>
+    <div class="d-flex gap-2">
+        <span class="badge bg-warning text-dark rounded-pill px-3 py-2 fw-bold shadow-sm">⏳ Bekleyen: @(bekleyenler?.Count ?? 0)</span>
+        <span class="badge bg-success rounded-pill px-3 py-2 fw-bold shadow-sm">✅ Onaylanan: @(onaylananlar?.Count ?? 0)</span>
+    </div>
+</div>
+
+<div class="card shadow border-0 mb-5">
+    <div class="card-header bg-dark text-white py-3 px-4">
+        <h5 class="mb-0 fw-bold text-warning">⏳ Onay Bekleyen Gönüllü Başvuruları</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle mb-0">
+                <thead class="table-secondary">
+                    <tr>
+                        <th class="ps-4">Ad Soyad</th>
+                        <th>Telefon</th>
+                        <th>Uzmanlık Alanı</th>
+                        <th class="text-center" style="width: 200px;">Aksiyonlar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (bekleyenler != null && bekleyenler.Any())
+                    {
+                        foreach (var item in bekleyenler)
+                        {
+                            <tr>
+                                <td class="fw-bold ps-4 text-dark">👤 @item.AdSoyad</td>
+                                <td><a href="tel:@item.Telefon" class="text-secondary fw-bold">📞 @item.Telefon</a></td>
+                                <td><span class="badge bg-secondary rounded-pill px-3 py-2 fw-bold">🛠️ @item.UzmanlikAlani</span></td>
+                                <td class="text-center pe-3">
+                                    <div class="d-flex gap-2 justify-content-center">
+                                        <form asp-action="Onayla" asp-route-id="@item.Id" method="post" class="m-0">
+                                            <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 fw-bold shadow-sm">✓ Kabul Et</button>
+                                        </form>
+                                        <form asp-action="Sil" asp-route-id="@item.Id" method="post" class="m-0" onsubmit="return confirm('Bu başvuruyu kalıcı olarak silmek istediğinize emin misiniz?');">
+                                            <button type="submit" class="btn btn-sm btn-danger rounded-pill px-3 fw-bold shadow-sm">✕ Sil</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center py-4 text-muted small">⏳ Onay bekleyen yeni bir başvuru bulunmuyor.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-lg border-0 mb-5">
+    <div class="card-header bg-success text-white py-3 px-4">
+        <h5 class="mb-0 fw-bold">🟢 Göreve Hazır Onaylı Gönüllü Listesi</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Ad Soyad</th>
+                        <th>Telefon</th>
+                        <th>Sahadaki Görevi / Uzmanlığı</th>
+                        <th class="pe-4 text-end">Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (onaylananlar != null && onaylananlar.Any())
+                    {
+                        foreach (var item in onaylananlar)
+                        {
+                            <tr class="table-success table-opacity-25">
+                                <td class="fw-bold ps-4 text-success">👤 @item.AdSoyad</td>
+                                <td><a href="tel:@item.Telefon" class="btn btn-sm btn-outline-success rounded-pill px-3 fw-bold">📞 @item.Telefon</a></td>
+                                <td><span class="badge bg-success rounded-pill px-3 py-2 fw-bold">🚀 @item.UzmanlikAlani</span></td>
+                                <td class="pe-4 text-end">
+                                    <span class="badge bg-success rounded-pill px-3 py-2 fw-bold shadow-sm">Saha Görevine Hazır</span>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center py-5 text-muted fw-bold">📭 Henüz onaylanmış bir sivil gönüllü kadrosu bulunmuyor. 上 yukarıdan onaylayın.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
