@@ -7,6 +7,18 @@
     <p class="lead text-muted max-w-2xl mx-auto mt-3">Afet durumlarında ihtiyaç sahipleri ile lojistik ekiplerini bir araya getiren canlı harita destekli açık kaynaklı karar sistemidir.</p>
 </div>
 
+<div class="card border-0 bg-dark text-white p-3 mb-4 rounded-4 shadow d-flex flex-row justify-content-between align-items-center border border-secondary">
+    <div>
+        <h6 id="sensorBaslik" class="mb-1 text-warning fw-bold">🌐 Akıllı Şehir Canlı Deprem Algılama Sistemi</h6>
+        <p class="mb-0 small text-white-50">Sistem mikrofon üzerinden donanımsal sarsıntı ve şok dalgalarını canlı tarar. Masaya vurulduğunda otonom tetiklenir.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <button id="btnSensörAktif" class="btn btn-outline-success rounded-pill fw-bold px-4" onclick="sensoruBaslat()">
+            🟢 Canlı Akustik Sensörü Başlat
+        </button>
+    </div>
+</div>
+
 <div class="row mt-4 justify-content-center">
     <div class="col-md-8 mb-4">
         <div class="card border-0 p-4 shadow-lg text-center bg-white rounded-4">
@@ -28,9 +40,9 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<div id="afetHaritasi" class="row mb-5 pt-2">
+<div id="afetHaritasiKapsayici" class="row mb-5 pt-2">
     <div class="col-12">
-        <div class="card shadow-lg border-0">
+        <div id="haritaKartKapsayici" class="card shadow-lg border-0">
             <div class="card-header bg-dark text-white d-flex flex-column flex-md-row justify-content-between align-items-center py-3 px-4">
                 <h5 class="mb-0 fw-bold d-flex align-items-center">📍 Canlı Çoklu Afet ve Kriz Haritası</h5>
 
@@ -47,14 +59,14 @@
                         <span class="me-2">🔄</span> Verileri Yenile
                     </button>
 
-                    <div class="bg-danger text-white rounded-pill fw-bold px-4 py-2 d-flex align-items-center shadow-sm" style="font-size: 0.85rem;">
+                    <div id="sistemDurumRozeti" class="bg-danger text-white rounded-pill fw-bold px-4 py-2 d-flex align-items-center shadow-sm" style="font-size: 0.85rem;">
                         <span class="spinner-grow spinner-grow-sm me-2" role="status"></span>
                         Sistem Aktif
                     </div>
                 </div>
             </div>
             <div class="card-body p-0">
-                <div id="turkiyeHaritasi" style="height: 530px; width: 100%; display: block; min-height: 530px;"></div>
+                <div id="turkiyeHaritasi" style="height: 530px; width: 100%; display: block; min-height: 530px; transition: all 0.3s ease;"></div>
             </div>
         </div>
     </div>
@@ -64,6 +76,7 @@
     var map = L.map('turkiyeHaritasi').setView([39.0, 35.0], 6);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
 
+    // İKON TANIMLAMALARI
     var depremIcon = L.icon({
         iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png',
         shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -88,37 +101,219 @@
         iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34]
     });
 
+    var iotNormalIcon = L.icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [20, 32], iconAnchor: [10, 32], popupAnchor: [1, -30]
+    });
+
+    var iotAlarmIcon = L.icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-violet.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [28, 45], iconAnchor: [14, 45], popupAnchor: [1, -40]
+    });
+
     var afetLayer = L.layerGroup().addTo(map);
     var toplanmaLayer = L.layerGroup().addTo(map);
+    var iotLayer = L.layerGroup().addTo(map);
+
+    var sensorBilgileri = [
+        { id: 1, isim: "GAZİANTEP - BOTAS Ana Gaz Dağıtım IoT Vanası", enlem: 37.0662, boylam: 37.3833, tur: "Gaz" },
+        { id: 2, isim: "GAZİANTEP - TEİAŞ Trafo Merkezi Akıllı Şebeke Sensörü", enlem: 37.0850, boylam: 37.4100, tur: "Elektrik" }
+    ];
+
+    var aktifIotMarkerlar = [];
+    var alarmVerildiMi = false;
+    var aktifSirenSesMotoru = null;
+
+    var sesMikrofonAkisi = null;
+    var javascriptIslemeNode = null;
+
+    function iotSensorleriniYukle() {
+        iotLayer.clearLayers();
+        aktifIotMarkerlar = [];
+        sensorBilgileri.forEach(function(sensor) {
+            var marker = L.marker([sensor.enlem, sensor.boylam], {icon: iotNormalIcon})
+                .bindPopup("<b>📡 IoT İstasyonu:</b> " + sensor.isim + "<br><span class='text-success fw-bold'>● Durum: Güvenli / Akış Aktif</span>");
+            iotLayer.addLayer(marker);
+            aktifIotMarkerlar.push({ id: sensor.id, marker: marker, data: sensor });
+        });
+    }
+
+    // MİS GİBİ ÇALIŞAN O REAKSİYON MOTORU
+    function sensoruBaslat() {
+        var btn = document.getElementById("btnSensörAktif");
+
+        if (alarmVerildiMi) {
+            sistemiSifirla();
+            return;
+        }
+
+        if (sesMikrofonAkisi) {
+            sistemiSifirla();
+            return;
+        }
+
+        navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+            .then(function(stream) {
+                sesMikrofonAkisi = stream;
+                btn.innerHTML = "🔍 Taramayı İptal Et / Durdur";
+                btn.className = "btn btn-warning rounded-pill fw-bold px-4 animate-pulse";
+
+                // SADECE BUTONA BASILIP AKTİF OLDUĞUNDA BU YAZI GELECEK
+                document.getElementById("sensorBaslik").innerHTML = "🌐 Akıllı Şehir Canlı Deprem Algılama Sistemi (Akustik Şok Sensörü Aktif)";
+
+                var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                var duser = audioContext.createMediaStreamSource(stream);
+                var analizor = audioContext.createAnalyser();
+                javascriptIslemeNode = audioContext.createScriptProcessor(2048, 1, 1);
+
+                analizor.smoothingTimeConstant = 0.3;
+                analizor.fftSize = 1024;
+
+                duser.connect(analizor);
+                analizor.connect(javascriptIslemeNode);
+                javascriptIslemeNode.connect(audioContext.destination);
+
+                javascriptIslemeNode.onaudioprocess = function() {
+                    if (alarmVerildiMi) return;
+
+                    var dizi = new Uint8Array(analizor.frequencyBinCount);
+                    analizor.getByteFrequencyData(dizi);
+                    var degerler = 0;
+
+                    for (var i = 0; i < dizi.length; i++) {
+                        degerler += dizi[i];
+                    }
+
+                    var ortalamaSesGurlutusu = degerler / dizi.length;
+
+                    // Masaya vurunca çalışan o desibel eşiği kanka
+                    if (ortalamaSesGurlutusu > 65) {
+                        alarmVerildiMi = true;
+                        iotSarsintiTetikle("Donanımsal Sismik Darbe Sensörü");
+                    }
+                };
+            })
+            .catch(function(err) {
+                alert("Mikrofon erişim izni gerekiyor kanka, tarayıcıdan onay ver.");
+            });
+    }
+
+    function iotSarsintiTetikle(kaynak) {
+        // DARBE ANINDA SAYFAYI HARİTAYA KAYDIRAN BOMBA SATIR
+        var haritaKapsayici = document.getElementById("afetHaritasiKapsayici");
+        if(haritaKapsayici) {
+            haritaKapsayici.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // Siren Sesi
+        try {
+            var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            aktifSirenSesMotoru = audioCtx.createOscillator();
+            var gainNode = audioCtx.createGain();
+            aktifSirenSesMotoru.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            aktifSirenSesMotoru.type = 'sawtooth';
+            aktifSirenSesMotoru.frequency.setValueAtTime(440, audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            aktifSirenSesMotoru.start();
+        } catch(e) {}
+
+        var haritaDiv = document.getElementById("turkiyeHaritasi");
+        var rozet = document.getElementById("sistemDurumRozeti");
+        var btn = document.getElementById("btnSensörAktif");
+
+        btn.innerHTML = "🔄 Alarmı Sustur ve Sistemi Sıfırla";
+        btn.className = "btn btn-light text-danger border border-danger rounded-pill fw-bold px-4";
+
+        haritaDiv.style.border = "6px solid #dc3545";
+        haritaDiv.style.boxShadow = "0 0 35px rgba(220, 53, 69, 0.8)";
+
+        rozet.innerHTML = "🚨 SENSÖR TETİKLENDİ: OTONOM KORUMA AKTİF!";
+        rozet.className = "bg-dark text-danger rounded-pill fw-bold px-4 py-2 d-flex align-items-center shadow-sm border border-danger";
+
+        map.flyTo([37.0662, 37.3833], 12, { animate: true, duration: 1.2 });
+
+        setTimeout(() => {
+            if (!alarmVerildiMi) return;
+            iotLayer.clearLayers();
+            aktifIotMarkerlar.forEach(function(item) {
+                var krizMarker = L.marker([item.data.enlem, item.data.boylam], {icon: iotAlarmIcon})
+                    .addTo(iotLayer)
+                    .bindPopup(
+                        "<div class='p-1'><h6 class='text-danger fw-bold mb-1'>🚨 " + kaynak + "</h6>" +
+                        "<p class='small mb-2'><b>İstasyon:</b> " + item.data.isim + "</p>" +
+                        "<div class='alert alert-danger py-1 px-2 small mb-0 fw-bold'>⚠️ Şok Dalga Algılandı! Şebeke Güvenliği İçin Hat Kapatıldı.</div></div>"
+                    );
+                if(item.data.id === 1) {
+                    setTimeout(() => { krizMarker.openPopup(); }, 500);
+                }
+            });
+        }, 1300);
+    }
+
+    function sistemiSifirla() {
+        alarmVerildiMi = false;
+
+        // SİSTEM DURDURULDUĞUNDA VEYA SIFIRLANDIĞINDA PARANTEZ İÇİ YAZI TAMAMEN SİLİNİR
+        document.getElementById("sensorBaslik").innerHTML = "🌐 Akıllı Şehir Canlı Deprem Algılama Sistemi";
+
+        if (aktifSirenSesMotoru) {
+            try { aktifSirenSesMotoru.stop(); } catch(e){}
+            aktifSirenSesMotoru = null;
+        }
+
+        if (sesMikrofonAkisi) {
+            sesMikrofonAkisi.getTracks().forEach(track => track.stop());
+            sesMikrofonAkisi = null;
+        }
+        if (javascriptIslemeNode) {
+            javascriptIslemeNode.onaudioprocess = null;
+            javascriptIslemeNode = null;
+        }
+
+        var haritaDiv = document.getElementById("turkiyeHaritasi");
+        var rozet = document.getElementById("sistemDurumRozeti");
+        var btn = document.getElementById("btnSensörAktif");
+
+        btn.innerHTML = "🟢 Canlı Akustik Sensörü Başlat";
+        btn.className = "btn btn-outline-success rounded-pill fw-bold px-4";
+
+        haritaDiv.style.border = "none";
+        haritaDiv.style.boxShadow = "none";
+
+        rozet.innerHTML = "<span class='spinner-grow spinner-grow-sm me-2' role='status'></span> Sistem Aktif";
+        rozet.className = "bg-danger text-white rounded-pill fw-bold px-4 py-2 d-flex align-items-center shadow-sm";
+
+        map.flyTo([39.0, 35.0], 6, { animate: true, duration: 1.2 });
+        iotSensorleriniYukle();
+    }
 
     var sehirVerileri = {
         adiyaman: {
-            merkez: [37.7648, 38.2786],
-            zoom: 13,
+            merkez: [37.7648, 38.2786], zoom: 13,
             alanlar: [
                 { isim: "Adıyaman Fuar Alanı Güvenli Toplanma Bölgesi", enlem: 37.7550, boylam: 38.2680, kapasite: "2500 Kişi", imkanlar: "Çadır Alanı, Sahra Hastanesi, Sıcak Yemek" },
                 { isim: "Eğriçay Parkı Çadır ve Lojistik Alanı", enlem: 37.7720, boylam: 38.2920, kapasite: "4000 Kişi", imkanlar: "Temiz Su, Elektrik Altyapısı, Çocuk Alanı" }
             ]
         },
         hatay: {
-            merkez: [36.2023, 36.1613],
-            zoom: 12,
+            merkez: [36.2023, 36.1613], zoom: 12,
             alanlar: [
                 { isim: "Hatay Stadyumu Geçici Barınma Merkezi", enlem: 36.2510, boylam: 36.1850, kapasite: "5000 Kişi", imkanlar: "Konteyner Kent Altyapısı, Koordinasyon Merkezi" }
             ]
         },
         kahramanmaras: {
-            merkez: [37.5746, 36.9371],
-            zoom: 12,
+            merkez: [37.5746, 36.9371], zoom: 12,
             alanlar: [
                 { isim: "Kafum Fuar Alanı Güvenli Bölge", enlem: 37.5580, boylam: 36.9520, kapasite: "3000 Kişi", imkanlar: "Mobil Mutfak, Güvenlik, WC/Duş" }
             ]
         },
         gaziantep: {
-            merkez: [37.0662, 37.3833],
-            zoom: 12,
+            merkez: [37.0662, 37.3833], zoom: 12,
             alanlar: [
-                { isim: "Gaziantep Festival Parkı Toplanma Alanı", enlem: 37.0780, boylam: 37.3620, kapasite: "6000 Kişi", imkanlar: "Geniş Tahliye Alanı, Wi-Fi İstasyonu, İlk Yardım" }
+                { isim: "Gaziantep Festival Parkı Toplanma Alanı", enlem: 37.0780, bodylam: 37.3620, kapasite: "6000 Kişi", imkanlar: "Geniş Tahliye Alanı, Wi-Fi İstasyonu, İlk Yardım" }
             ]
         }
     };
@@ -135,12 +330,9 @@
             .then(response => response.json())
             .then(data => {
                 var listelenenCount = 0;
-
                 for (var i = 0; i < data.result.length; i++) {
                     if (listelenenCount >= 15) break;
-
                     var deprem = data.result[i];
-
                     if (deprem.mag > 2.5) {
                         var enlem = deprem.geojson.coordinates[1];
                         var boylam = deprem.geojson.coordinates[0];
@@ -198,23 +390,15 @@
     function sehreOdaklanVeToplanmaAlanlariniGetir() {
         var secilenSehir = document.getElementById("sehirSecimi").value;
         toplanmaLayer.clearLayers();
-
         if (secilenSehir && sehirVerileri[secilenSehir]) {
             var sehir = sehirVerileri[secilenSehir];
             map.flyTo(sehir.merkez, sehir.zoom, { animate: true, duration: 1.5 });
-
             sehir.alanlar.forEach(function (alan) {
                 var marker = L.marker([alan.enlem, alan.boylam], { icon: toplanmaIcon })
-                    .bindPopup(
-                        "<div class='p-1'><h6 class='text-success fw-bold mb-1'>🌳 " + alan.isim + "</h6>" +
-                        "<p class='text-muted small mb-0'><strong>Kapasite:</strong> " + alan.kapasite + "</p>" +
-                        "<p class='text-muted small mb-0'><strong>Altyapı:</strong> " + alan.imkanlar + "</p></div>"
-                    );
+                    .bindPopup("<div class='p-1'><h6 class='text-success fw-bold mb-1'>🌳 " + alan.isim + "</h6><p class='text-muted small mb-0'><strong>Kapasite:</strong> " + alan.kapasite + "</p><p class='text-muted small mb-0'><strong>Altyapı:</strong> " + alan.imkanlar + "</p></div>");
                 toplanmaLayer.addLayer(marker);
             });
-        } else {
-            map.flyTo([39.0, 35.0], 6, { animate: true, duration: 1.2 });
-        }
+        } else { map.flyTo([39.0, 35.0], 6, { animate: true, duration: 1.2 }); }
     }
 
     function acilEkipIste(lokasyon, afetTuru) {
@@ -222,4 +406,5 @@
     }
 
     afetVerileriniGetir();
+    iotSensorleriniYukle();
 </script>
