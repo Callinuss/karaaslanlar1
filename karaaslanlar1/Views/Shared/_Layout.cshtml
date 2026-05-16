@@ -19,20 +19,82 @@
                 <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav me-auto mb-2 mb-md-0 ms-md-4 gap-2">
                         <li class="nav-item">
-                            <a class="nav-link text-white-50 opacity-hover px-3 rounded-pill fw-medium" asp-area="" asp-controller="Home" asp-action="Index">Ana Sayfa</a>
+                            <a class="nav-link text-white-50 opacity-hover px-3 rounded-pill fw-medium" asp-area="" asp-controller="Home" asp-action="Index">🗺️ Canlı Harita</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white bg-danger bg-opacity-25 text-danger border border-danger border-opacity-25 px-3 rounded-pill fw-bold shadow-sm"
-                               asp-area="" asp-controller="AfetTalepleri" asp-action="Index">📋 İhtiyaç Panosu</a>
-                        </li>
+
+                        @if (Context.Session.GetString("KullaniciRolu") != "Admin")
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-white bg-danger bg-opacity-25 text-danger border border-danger border-opacity-25 px-3 rounded-pill fw-bold shadow-sm"
+                                   asp-area="" asp-controller="AfetTalepleri" asp-action="Create">🚨 İhtiyaç Bildir</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white-50 opacity-hover px-3 rounded-pill fw-medium"
+                                   asp-controller="Gonullu" asp-action="Create">🙋‍♂️ Gönüllü Ol</a>
+                            </li>
+                        }
+
+                        @if (Context.Session.GetString("KullaniciRolu") == "Admin")
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-white bg-warning bg-opacity-25 text-warning border border-warning border-opacity-25 px-3 rounded-pill fw-bold shadow-sm"
+                                   asp-area="" asp-controller="AfetTalepleri" asp-action="Index">📋 Gelen İhtiyaç Talepleri</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white-50 opacity-hover px-3 rounded-pill fw-medium"
+                                   asp-controller="Gonullu" asp-action="Index">👥 Gönüllü Başvurularını Yönet</a>
+                            </li>
+                            <li class="nav-item d-flex align-items-center">
+                                <span class="badge bg-primary rounded-pill px-3 py-2 ms-2 fw-bold" style="font-size:0.8rem;">⚙️ Merkez Komuta Yetkilisi</span>
+                            </li>
+                        }
                     </ul>
+
+                    <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
+                        @if (Context.Session.GetString("KullaniciRolu") == "Admin")
+                        {
+                            <span class="text-white-50 small me-2">Hoş geldiniz, Admin</span>
+                            <a asp-controller="Home" asp-action="Logout" class="btn btn-outline-light rounded-pill btn-sm px-3 fw-bold">🚪 Güvenli Çıkış</a>
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-warning btn-sm rounded-pill px-4 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#loginModal" style="font-size: 0.85rem;">
+                                🔐 Admin Girişi
+                            </button>
+                        }
+                    </div>
                 </div>
             </div>
         </nav>
     </header>
+
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+            <div class="modal-content border-0 rounded-4 shadow-lg" style="background-color: #131c2e; color: #ffffff;">
+                <div class="modal-header border-0 pb-0 px-4 pt-4">
+                    <h5 class="modal-title fw-bold text-danger" id="loginModalLabel">🚨 Yetkili Personel Girişi</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-toggle="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form asp-controller="Home" asp-action="Login" method="post">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-white-50">E-Posta Adresi</label>
+                            <input type="email" name="email" class="form-control rounded-3 bg-dark text-white border-secondary py-2" placeholder="admin@afet.com" required />
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold text-white-50">Güvenlik Şifresi</label>
+                            <input type="password" name="sifre" class="form-control rounded-3 bg-dark text-white border-secondary py-2" placeholder="123456" required />
+                        </div>
+                        <button type="submit" class="btn btn-danger w-100 rounded-pill py-2.5 fw-bold shadow">Sistem Kimliğini Doğrula</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="container mt-4">
         <main role="main" class="pb-3">
@@ -99,12 +161,7 @@
             var body = document.body;
             body.classList.toggle("dark-mode");
             var icon = document.getElementById("themeIcon");
-
-            if (body.classList.contains("dark-mode")) {
-                icon.innerHTML = "☀️";
-            } else {
-                icon.innerHTML = "🌓";
-            }
+            if (body.classList.contains("dark-mode")) { icon.innerHTML = "☀️"; } else { icon.innerHTML = "🌓"; }
         }
     </script>
     @await RenderSectionAsync("Scripts", required: false)

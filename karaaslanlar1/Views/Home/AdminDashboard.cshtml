@@ -1,0 +1,27 @@
+﻿@{
+    ViewData["Title"] = "Admin Komuta Merkezi";
+}
+
+<div class="alert alert-danger rounded-3 shadow-sm border-0 mt-4 d-flex align-items-center justify-content-between p-3" style="background-color: #fef2f2; color: #991b1b;">
+    <div class="d-flex align-items-center">
+        <span class="fs-4 me-3">⚙️</span>
+        <div>
+            <h5 class="alert-heading fw-bold mb-0">Merkez Komuta Yetkili Paneli</h5>
+            <p class="mb-0 small opacity-75">Sistem şu an tam yetkili modda çalışıyor. Tüm operasyonel lojistik talepleri ve sivil gönüllü listeleri erişiminize açıktır.</p>
+        </div>
+    </div>
+    <span class="badge bg-danger rounded-pill px-3 py-2 fw-bold animate-pulse">CANLI TAKİP AKTİF</span>
+</div>
+
+<div class="row mt-4 mb-5">
+    <div class="col-12">
+        <div class="card shadow-lg border-0">
+            <div class="card-header bg-dark text-white py-3 px-4">
+                <h5 class="mb-0 fw-bold">🚨 Komuta Merkezi Kriz ve Lojistik Analiz Ekranı</h5>
+            </div>
+            <div class="card-body p-0">
+                @await Html.PartialAsync("~/Views/Home/Index.cshtml")
+            </div>
+        </div>
+    </div>
+</div>

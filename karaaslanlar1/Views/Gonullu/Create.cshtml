@@ -1,0 +1,56 @@
+﻿@model karaaslanlar1.Models.GonulluBasvuru
+
+@{
+    ViewData["Title"] = "Gönüllü Başvuru Formu";
+}
+
+<div class="row justify-content-center mt-5 mb-5">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-lg rounded-4 p-4">
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <h2 class="fw-bold text-primary">🙋‍♂️ Sivil Gönüllü Kayıt Formu</h2>
+                    <p class="text-muted small">Afet lojistik destek ve saha koordinasyon ekiplerimize katılmak için bilgilerinizi eksiksiz doldurunuz.</p>
+                </div>
+
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="AdSoyad" class="form-label fw-bold small text-secondary"></label>
+                        <input asp-for="AdSoyad" class="form-control rounded-3 py-2" placeholder="Ahmet Yılmaz" required />
+                        <span asp-validation-for="AdSoyad" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Telefon" class="form-label fw-bold small text-secondary"></label>
+                        <input asp-for="Telefon" class="form-control rounded-3 py-2" placeholder="0555 XXXXXXX" required />
+                        <span asp-validation-for="Telefon" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="UzmanlikAlani" class="form-label fw-bold small text-secondary">Uzmanlık Alanınız / Kan Grubunuz</label>
+                        <select asp-for="UzmanlikAlani" class="form-select rounded-3 py-2" required>
+                            <option value="">Seçiniz...</option>
+                            <option value="Arama Kurtarma Ekibi">Arama Kurtarma</option>
+                            <option value="Sağlık / İlk Yardım Personeli">Sağlık / İlk Yardım</option>
+                            <option value="Saha Lojistik / Dağıtım">Saha Lojistik / Dağıtım</option>
+                            <option value="Yazılım / İletişim / Telsiz">Yazılım / İletişim / Telsiz</option>
+                            <option value="Sürücü / İş Makinesi Operatörü">Sürücü / İş Makinesi Operatörü</option>
+                            <option value="Genel Destek Gönüllüsü">Genel Destek Gönüllüsü</option>
+                        </select>
+                        <span asp-validation-for="UzmanlikAlani" class="text-danger small"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill fw-bold shadow-sm">Başvuruyu Komuta Merkezine Gönder</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

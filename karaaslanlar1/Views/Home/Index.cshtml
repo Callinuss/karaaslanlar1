@@ -7,26 +7,17 @@
     <p class="lead text-muted max-w-2xl mx-auto mt-3">Afet durumlarında ihtiyaç sahipleri ile lojistik ekiplerini bir araya getiren canlı harita destekli açık kaynaklı karar sistemidir.</p>
 </div>
 
-<div class="row mt-4">
-    <div class="col-md-6 mb-4">
-        <div class="card h-100 border-0 p-3">
-            <div class="card-body text-center d-flex flex-column justify-content-between">
+<div class="row mt-4 justify-content-center">
+    <div class="col-md-8 mb-4">
+        <div class="card border-0 p-4 shadow-lg text-center bg-white rounded-4">
+            <div class="card-body d-flex flex-column justify-content-between">
                 <div>
-                    <h3 class="fw-bold text-danger mb-3">Yardım İste</h3>
-                    <p class="text-muted">Bölgenizdeki acil ihtiyaçları (çadır, su, ilaç) sisteme girerek saha ekiplerine anında ulaştırın.</p>
+                    <h2 class="fw-bold text-danger mb-3">🚨 Acil Yardım İste</h2>
+                    <p class="text-muted fs-5">Bölgenizdeki acil lojistik ihtiyaçları (çadır, su, ilaç, tahliye) sisteme girerek saha ekiplerine ve yapay zeka triyaj merkezine anında ulaştırın.</p>
                 </div>
-                <a asp-controller="AfetTalepleri" asp-action="Create" class="btn btn-premium-danger btn-lg rounded-pill px-5 py-2.5 mt-3 shadow-sm">Yeni İhtiyaç Bildir</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6 mb-4">
-        <div class="card h-100 border-0 p-3">
-            <div class="card-body text-center d-flex flex-column justify-content-between">
-                <div>
-                    <h3 class="fw-bold text-success mb-3">Yardım Et</h3>
-                    <p class="text-muted">Güncel kriz haritasındaki lojistik talepleri görüntüleyin, doğru yere doğru yardımı ulaştırın.</p>
+                <div class="mt-3">
+                    <a asp-controller="AfetTalepleri" asp-action="Create" class="btn btn-danger btn-lg rounded-pill px-5 py-3 fw-bold shadow">Yeni İhtiyaç Bildirimi Oluştur</a>
                 </div>
-                <a asp-controller="AfetTalepleri" asp-action="Index" class="btn btn-premium-success btn-lg rounded-pill px-5 py-2.5 mt-3 shadow-sm">Talepleri Görüntüle</a>
             </div>
         </div>
     </div>
