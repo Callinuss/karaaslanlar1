@@ -42,10 +42,20 @@
         <div class="card shadow-lg border-0">
             <div class="card-header bg-dark text-white d-flex flex-column flex-md-row justify-content-between align-items-center py-3 px-4">
                 <h5 class="mb-0 fw-bold d-flex align-items-center">📍 Canlı Çoklu Afet ve Kriz Haritası</h5>
-                <div class="d-flex align-items-center gap-3 mt-3 mt-md-0">
+
+                <div class="d-flex flex-column flex-sm-row align-items-center gap-3 mt-3 mt-md-0 w-100 w-md-auto justify-content-end">
+                    <select id="sehirSecimi" class="form-select form-select-sm rounded-pill border-0 px-3 py-2 fw-bold bg-secondary text-white" style="width: 230px; font-size: 0.85rem; cursor: pointer;" onchange="sehreOdaklanVeToplanmaAlanlariniGetir()">
+                        <option value="">🔍 Bölgesel Toplanma Alanı Seç...</option>
+                        <option value="adiyaman">Adıyaman</option>
+                        <option value="hatay">Hatay</option>
+                        <option value="kahramanmaras">Kahramanmaraş</option>
+                        <option value="gaziantep">Gaziantep</option>
+                    </select>
+
                     <button id="btnYenile" class="btn btn-warning rounded-pill fw-bold px-4 py-2 d-flex align-items-center shadow-sm" onclick="afetVerileriniGetir()" style="font-size: 0.85rem;">
                         <span class="me-2">🔄</span> Verileri Yenile
                     </button>
+
                     <div class="bg-danger text-white rounded-pill fw-bold px-4 py-2 d-flex align-items-center shadow-sm" style="font-size: 0.85rem;">
                         <span class="spinner-grow spinner-grow-sm me-2" role="status"></span>
                         Sistem Aktif
@@ -53,7 +63,7 @@
                 </div>
             </div>
             <div class="card-body p-0">
-                <div id="turkiyeHaritasi"></div>
+                <div id="turkiyeHaritasi" style="height: 530px; width: 100%; display: block; min-height: 530px;"></div>
             </div>
         </div>
     </div>
@@ -63,7 +73,6 @@
     var map = L.map('turkiyeHaritasi').setView([39.0, 35.0], 6);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
 
-    // AFET TÜRLERİNE ÖZEL PROFESYONEL İKON MODÜLLERİ
     var depremIcon = L.icon({
         iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png',
         shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -78,41 +87,95 @@
 
     var selIcon = L.icon({
         iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+        shadowUrl: 'https://cdnjs.mathbf.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34]
+    });
+
+    var toplanmaIcon = L.icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
         shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
         iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34]
     });
 
     var afetLayer = L.layerGroup().addTo(map);
+    var toplanmaLayer = L.layerGroup().addTo(map);
+
+    var sehirVerileri = {
+        adiyaman: {
+            merkez: [37.7648, 38.2786],
+            zoom: 13,
+            alanlar: [
+                { isim: "Adıyaman Fuar Alanı Güvenli Toplanma Bölgesi", enlem: 37.7550, boylam: 38.2680, kapasite: "2500 Kişi", imkanlar: "Çadır Alanı, Sahra Hastanesi, Sıcak Yemek" },
+                { isim: "Eğriçay Parkı Çadır ve Lojistik Alanı", enlem: 37.7720, boylam: 38.2920, kapasite: "4000 Kişi", imkanlar: "Temiz Su, Elektrik Altyapısı, Çocuk Alanı" }
+            ]
+        },
+        hatay: {
+            merkez: [36.2023, 36.1613],
+            zoom: 12,
+            alanlar: [
+                { isim: "Hatay Stadyumu Geçici Barınma Merkezi", enlem: 36.2510, boylam: 36.1850, kapasite: "5000 Kişi", imkanlar: "Konteyner Kent Altyapısı, Koordinasyon Merkezi" }
+            ]
+        },
+        kahramanmaras: {
+            merkez: [37.5746, 36.9371],
+            zoom: 12,
+            alanlar: [
+                { isim: "Kafum Fuar Alanı Güvenli Bölge", enlem: 37.5580, boylam: 36.9520, kapasite: "3000 Kişi", imkanlar: "Mobil Mutfak, Güvenlik, WC/Duş" }
+            ]
+        },
+        gaziantep: {
+            merkez: [37.0662, 37.3833],
+            zoom: 12,
+            alanlar: [
+                { isim: "Gaziantep Festival Parkı Toplanma Alanı", enlem: 37.0780, boylam: 37.3620, kapasite: "6000 Kişi", imkanlar: "Geniş Tahliye Alanı, Wi-Fi İstasyonu, İlk Yardım" }
+            ]
+        }
+    };
 
     function afetVerileriniGetir() {
         var btn = document.getElementById("btnYenile");
-        btn.innerHTML = "<span class='spinner-border spinner-border-sm me-2'></span> Yükleniyor...";
-        btn.disabled = true;
+        if(btn) {
+            btn.innerHTML = "<span class='spinner-border spinner-border-sm me-2'></span> Yükleniyor...";
+            btn.disabled = true;
+        }
         afetLayer.clearLayers();
 
-        // 1. KATMAN: CANLI DEPREM VERİLERİ (Kandilli API - 2.5 Şiddeti Üzeri Filtreli)
+        // CHIP DOSYASI: Razor motoru çökmesin diye filtreleme mantığını güvenli döngüye çevirdik
         fetch('https://api.orhanaydogdu.com.tr/deprem/kandilli/live')
             .then(response => response.json())
             .then(data => {
-                var filtrelenmis = data.result.filter(d => d.mag > 2.5).slice(0, 15);
-                filtrelenmis.forEach(function(deprem) {
-                    var enlem = deprem.geojson.coordinates[1];
-                    var boylam = deprem.geojson.coordinates[0];
-                    var buyukluk = deprem.mag;
-                    var yer = deprem.title;
-                    var tarih = deprem.date || deprem.date_time || "Güncel";
+                var listelenenCount = 0;
 
-                    var marker = L.marker([enlem, boylam], {icon: depremIcon})
-                        .bindPopup(
-                            "<div class='p-1'><h6 class='text-warning fw-bold mb-1'>💥 Deprem (M " + buyukluk + ")</h6>" +
-                            "<p class='text-muted small mb-2'><strong>Konum:</strong> " + yer + "<br><strong>Tarih:</strong> " + tarih + "</p>" +
-                            "<button onclick=\"acilEkipIste('" + yer + "', 'Deprem')\" class='btn btn-sm btn-danger w-100 rounded-pill shadow-sm'>Bölgeye Ekip İste</button></div>"
-                        );
-                    afetLayer.addLayer(marker);
-                });
-            }).catch(err => console.error("Deprem verisi çekilemedi:", err));
+                for (var i = 0; i < data.result.length; i++) {
+                    if (listelenenCount >= 15) break; // Maksimum 15 veri sınırı
 
-        // 2. KATMAN: AKTİF ORMAN YANGINLARI (Simülasyon Verileri)
+                    var deprem = data.result[i];
+
+                    // Sadece 2.5 üzerini al (Razor güvenli kontrol)
+                    if (deprem.mag > 2.5) {
+                        var enlem = deprem.geojson.coordinates[1];
+                        var boylam = deprem.geojson.coordinates[0];
+                        var buyukluk = deprem.mag;
+                        var yer = deprem.title;
+                        var tarih = deprem.date || "Güncel";
+
+                        var marker = L.marker([enlem, boylam], {icon: depremIcon})
+                            .bindPopup(
+                                "<div class='p-1'><h6 class='text-warning fw-bold mb-1'>💥 Deprem (M " + buyukluk + ")</h6>" +
+                                "<p class='text-muted small mb-2'><strong>Konum:</strong> " + yer + "<br><strong>Tarih:</strong> " + tarih + "</p>" +
+                                "<button onclick=\"acilEkipIste('" + yer + "', 'Deprem')\" class='btn btn-sm btn-danger w-100 rounded-pill shadow-sm'>Bölgeye Ekip İste</button></div>"
+                            );
+                        afetLayer.addLayer(marker);
+                        listelenenCount++;
+                    }
+                }
+                if(btn) { btn.innerHTML = "🔄 Verileri Yenile"; btn.disabled = false; }
+            }).catch(err => {
+                console.error("API hatası:", err);
+                if(btn) { btn.innerHTML = "🔄 Verileri Yenile"; btn.disabled = false; }
+            });
+
+        // 2. KATMAN: AKTİF ORMAN YANGINLARI
         var aktifYanginlar = [
             { konum: "Antalya / Manavgat Ormanlık Alanı", enlem: 36.78, boylam: 31.44, detay: "Tepe yangını, kuvvetli rüzgar etkisi" },
             { konum: "Muğla / Marmaris İçmeler Mevkii", enlem: 36.85, boylam: 28.27, detay: "Örtü yangını, havadan müdahale sürüyor" }
@@ -122,13 +185,13 @@
             var marker = L.marker([yangin.enlem, yangin.boylam], {icon: yanginIcon})
                 .bindPopup(
                     "<div class='p-1'><h6 class='text-danger fw-bold mb-1'>🔥 Aktif Orman Yangını</h6>" +
-                    "<p class='text-muted small mb-2'><strong>Konum:</strong> " + yangin.conum + "<br><strong>Durum:</strong> " + yangin.detay + "</p>" +
-                    "<button onclick=\"acilEkipIste('" + yangin.konum + "', 'Yangin')\" class='btn btn-sm btn-danger w-100 rounded-pill shadow-sm'>İtfaiye/Arazöz Yönlendir</button></div>"
+                    "<p class='text-muted small mb-2'><strong>Konum:</strong> " + yangin.konum + "<br><strong>Durum:</strong> " + yangin.detay + "</p>" +
+                    "<button onclick=\"acilEkipIste('" + yangin.konum + "', 'Yangin')\" class='btn btn-sm btn-danger w-100 rounded-pill shadow-sm'>İtfaiye Yönlendir</button></div>"
                 );
             afetLayer.addLayer(marker);
         });
 
-        // 3. KATMAN: KRİTİK SEL VE SU BASKINI İHBARLARI (Simülasyon Verileri)
+        // 3. KATMAN: KRİTİK SEL VE SU BASKINI İHBARLARI
         var aktifSeller = [
             { konum: "Rize / Çayeli Merkez", enlem: 41.01, boylam: 40.72, detay: "Dere taşkını riski, metrekareye yoğun yağış" },
             { konum: "Giresun / Dereli İlçesi", enlem: 40.74, boylam: 38.45, detay: "Anlık su baskını, tahliye ekipleri sahada" }
@@ -143,15 +206,33 @@
                 );
             afetLayer.addLayer(marker);
         });
-
-        setTimeout(() => { btn.innerHTML = "🔄 Verileri Yenile"; btn.disabled = false; }, 500);
     }
 
-    // GELİŞMİŞ YÖNLENDİRME MOTORU: Hem konumu hem de afet türünü parametre olarak taşır
+    function sehreOdaklanVeToplanmaAlanlariniGetir() {
+        var secilenSehir = document.getElementById("sehirSecimi").value;
+        toplanmaLayer.clearLayers();
+
+        if (secilenSehir && sehirVerileri[secilenSehir]) {
+            var sehir = sehirVerileri[secilenSehir];
+            map.flyTo(sehir.merkez, sehir.zoom, { animate: true, duration: 1.5 });
+
+            sehir.alanlar.forEach(function (alan) {
+                var marker = L.marker([alan.enlem, alan.boylam], { icon: toplanmaIcon })
+                    .bindPopup(
+                        "<div class='p-1'><h6 class='text-success fw-bold mb-1'>🌳 " + alan.isim + "</h6>" +
+                        "<p class='text-muted small mb-0'><strong>Kapasite:</strong> " + alan.kapasite + "</p>" +
+                        "<p class='text-muted small mb-0'><strong>Altyapı:</strong> " + alan.imkanlar + "</p></div>"
+                    );
+                toplanmaLayer.addLayer(marker);
+            });
+        } else {
+            map.flyTo([39.0, 35.0], 6, { animate: true, duration: 1.2 });
+        }
+    }
+
     function acilEkipIste(lokasyon, afetTuru) {
         window.location.href = '/AfetTalepleri/Create?gelenKonum=' + encodeURIComponent(lokasyon) + '&afetTuru=' + afetTuru;
     }
 
-    // Sayfa ilk açıldığında tüm katmanları yükle
     afetVerileriniGetir();
 </script>

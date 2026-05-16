@@ -8,5 +8,6 @@ namespace karaaslanlar1.Models
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         public DbSet<AfetTalebi> Talepler { get; set; }
+        public DbSet<GonulluBasvuru> GonulluBasvurulari { get; set; }
     }
 }
