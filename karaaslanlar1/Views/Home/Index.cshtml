@@ -1,0 +1,157 @@
+﻿@{
+    ViewData["Title"] = "Ana Sayfa";
+}
+
+<div class="text-center mt-5 mb-5">
+    <h1 class="display-4 section-title text-danger">Kriz Anında Hızlı Çözüm</h1>
+    <p class="lead text-muted max-w-2xl mx-auto mt-3">Afet durumlarında ihtiyaç sahipleri ile lojistik ekiplerini bir araya getiren canlı harita destekli açık kaynaklı karar sistemidir.</p>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 border-0 p-3">
+            <div class="card-body text-center d-flex flex-column justify-content-between">
+                <div>
+                    <h3 class="fw-bold text-danger mb-3">Yardım İste</h3>
+                    <p class="text-muted">Bölgenizdeki acil ihtiyaçları (çadır, su, ilaç) sisteme girerek saha ekiplerine anında ulaştırın.</p>
+                </div>
+                <a asp-controller="AfetTalepleri" asp-action="Create" class="btn btn-premium-danger btn-lg rounded-pill px-5 py-2.5 mt-3 shadow-sm">Yeni İhtiyaç Bildir</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 border-0 p-3">
+            <div class="card-body text-center d-flex flex-column justify-content-between">
+                <div>
+                    <h3 class="fw-bold text-success mb-3">Yardım Et</h3>
+                    <p class="text-muted">Güncel kriz haritasındaki lojistik talepleri görüntüleyin, doğru yere doğru yardımı ulaştırın.</p>
+                </div>
+                <a asp-controller="AfetTalepleri" asp-action="Index" class="btn btn-premium-success btn-lg rounded-pill px-5 py-2.5 mt-3 shadow-sm">Talepleri Görüntüle</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5 opacity-25" />
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="card shadow-lg border-0">
+            <div class="card-header bg-dark text-white d-flex flex-column flex-md-row justify-content-between align-items-center py-3 px-4">
+                <h5 class="mb-0 fw-bold d-flex align-items-center">📍 Canlı Çoklu Afet ve Kriz Haritası</h5>
+                <div class="d-flex align-items-center gap-3 mt-3 mt-md-0">
+                    <button id="btnYenile" class="btn btn-warning rounded-pill fw-bold px-4 py-2 d-flex align-items-center shadow-sm" onclick="afetVerileriniGetir()" style="font-size: 0.85rem;">
+                        <span class="me-2">🔄</span> Verileri Yenile
+                    </button>
+                    <div class="bg-danger text-white rounded-pill fw-bold px-4 py-2 d-flex align-items-center shadow-sm" style="font-size: 0.85rem;">
+                        <span class="spinner-grow spinner-grow-sm me-2" role="status"></span>
+                        Sistem Aktif
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div id="turkiyeHaritasi"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var map = L.map('turkiyeHaritasi').setView([39.0, 35.0], 6);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+
+    // AFET TÜRLERİNE ÖZEL PROFESYONEL İKON MODÜLLERİ
+    var depremIcon = L.icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34]
+    });
+
+    var yanginIcon = L.icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34]
+    });
+
+    var selIcon = L.icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34]
+    });
+
+    var afetLayer = L.layerGroup().addTo(map);
+
+    function afetVerileriniGetir() {
+        var btn = document.getElementById("btnYenile");
+        btn.innerHTML = "<span class='spinner-border spinner-border-sm me-2'></span> Yükleniyor...";
+        btn.disabled = true;
+        afetLayer.clearLayers();
+
+        // 1. KATMAN: CANLI DEPREM VERİLERİ (Kandilli API - 2.5 Şiddeti Üzeri Filtreli)
+        fetch('https://api.orhanaydogdu.com.tr/deprem/kandilli/live')
+            .then(response => response.json())
+            .then(data => {
+                var filtrelenmis = data.result.filter(d => d.mag > 2.5).slice(0, 15);
+                filtrelenmis.forEach(function(deprem) {
+                    var enlem = deprem.geojson.coordinates[1];
+                    var boylam = deprem.geojson.coordinates[0];
+                    var buyukluk = deprem.mag;
+                    var yer = deprem.title;
+                    var tarih = deprem.date || deprem.date_time || "Güncel";
+
+                    var marker = L.marker([enlem, boylam], {icon: depremIcon})
+                        .bindPopup(
+                            "<div class='p-1'><h6 class='text-warning fw-bold mb-1'>💥 Deprem (M " + buyukluk + ")</h6>" +
+                            "<p class='text-muted small mb-2'><strong>Konum:</strong> " + yer + "<br><strong>Tarih:</strong> " + tarih + "</p>" +
+                            "<button onclick=\"acilEkipIste('" + yer + "', 'Deprem')\" class='btn btn-sm btn-danger w-100 rounded-pill shadow-sm'>Bölgeye Ekip İste</button></div>"
+                        );
+                    afetLayer.addLayer(marker);
+                });
+            }).catch(err => console.error("Deprem verisi çekilemedi:", err));
+
+        // 2. KATMAN: AKTİF ORMAN YANGINLARI (Simülasyon Verileri)
+        var aktifYanginlar = [
+            { konum: "Antalya / Manavgat Ormanlık Alanı", enlem: 36.78, boylam: 31.44, detay: "Tepe yangını, kuvvetli rüzgar etkisi" },
+            { konum: "Muğla / Marmaris İçmeler Mevkii", enlem: 36.85, boylam: 28.27, detay: "Örtü yangını, havadan müdahale sürüyor" }
+        ];
+
+        aktifYanginlar.forEach(function(yangin) {
+            var marker = L.marker([yangin.enlem, yangin.boylam], {icon: yanginIcon})
+                .bindPopup(
+                    "<div class='p-1'><h6 class='text-danger fw-bold mb-1'>🔥 Aktif Orman Yangını</h6>" +
+                    "<p class='text-muted small mb-2'><strong>Konum:</strong> " + yangin.conum + "<br><strong>Durum:</strong> " + yangin.detay + "</p>" +
+                    "<button onclick=\"acilEkipIste('" + yangin.konum + "', 'Yangin')\" class='btn btn-sm btn-danger w-100 rounded-pill shadow-sm'>İtfaiye/Arazöz Yönlendir</button></div>"
+                );
+            afetLayer.addLayer(marker);
+        });
+
+        // 3. KATMAN: KRİTİK SEL VE SU BASKINI İHBARLARI (Simülasyon Verileri)
+        var aktifSeller = [
+            { konum: "Rize / Çayeli Merkez", enlem: 41.01, boylam: 40.72, detay: "Dere taşkını riski, metrekareye yoğun yağış" },
+            { konum: "Giresun / Dereli İlçesi", enlem: 40.74, boylam: 38.45, detay: "Anlık su baskını, tahliye ekipleri sahada" }
+        ];
+
+        aktifSeller.forEach(function(sel) {
+            var marker = L.marker([sel.enlem, sel.boylam], {icon: selIcon})
+                .bindPopup(
+                    "<div class='p-1'><h6 class='text-primary fw-bold mb-1'>🌊 Sel / Su Baskını Riski</h6>" +
+                    "<p class='text-muted small mb-2'><strong>Konum:</strong> " + sel.konum + "<br><strong>Durum:</strong> " + sel.detay + "</p>" +
+                    "<button onclick=\"acilEkipIste('" + sel.konum + "', 'Sel')\" class='btn btn-sm btn-danger w-100 rounded-pill shadow-sm'>Tahliye Ekibi İste</button></div>"
+                );
+            afetLayer.addLayer(marker);
+        });
+
+        setTimeout(() => { btn.innerHTML = "🔄 Verileri Yenile"; btn.disabled = false; }, 500);
+    }
+
+    // GELİŞMİŞ YÖNLENDİRME MOTORU: Hem konumu hem de afet türünü parametre olarak taşır
+    function acilEkipIste(lokasyon, afetTuru) {
+        window.location.href = '/AfetTalepleri/Create?gelenKonum=' + encodeURIComponent(lokasyon) + '&afetTuru=' + afetTuru;
+    }
+
+    // Sayfa ilk açıldığında tüm katmanları yükle
+    afetVerileriniGetir();
+</script>

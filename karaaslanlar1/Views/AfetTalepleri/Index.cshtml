@@ -1,0 +1,137 @@
+﻿@model IEnumerable<karaaslanlar1.Models.AfetTalebi>
+
+@{
+    ViewData["Title"] = "İhtiyaç Panosu";
+}
+
+<div class="d-flex justify-content-between align-items-center mt-4 mb-4">
+    <h2 class="section-title mb-0">📋 Acil İhtiyaç Panosu</h2>
+    <a asp-action="Create" class="btn btn-premium-danger rounded-pill px-4 fw-bold shadow-sm">➕ Yeni Talep Ekle</a>
+</div>
+
+<div class="row mb-5">
+    <div class="col-md-4 mb-3">
+        <div class="card bg-white p-3 border-start border-4 border-primary">
+            <div class="card-body d-flex justify-content-between align-items-center py-2">
+                <div>
+                    <h6 class="text-muted fw-bold text-uppercase mb-1" style="font-size: 0.8rem; letter-spacing: 0.5px;">Toplam İhbar</h6>
+                    <h2 id="statsToplam" class="fw-extrabold mb-0 text-primary">0</h2>
+                </div>
+                <div class="fs-1 text-primary opacity-50">📦</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <div class="card bg-white p-3 border-start border-4 border-danger">
+            <div class="card-body d-flex justify-content-between align-items-center py-2">
+                <div>
+                    <h6 class="text-muted fw-bold text-uppercase mb-1" style="font-size: 0.8rem; letter-spacing: 0.5px;">Kritik Durum</h6>
+                    <h2 id="statsKritik" class="fw-extrabold mb-0 text-danger">0</h2>
+                </div>
+                <div class="fs-1 text-danger opacity-50">🚨</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <div class="card bg-white p-3 border-start border-4 border-warning">
+            <div class="card-body d-flex justify-content-between align-items-center py-2">
+                <div>
+                    <h6 class="text-muted fw-bold text-uppercase mb-1" style="font-size: 0.8rem; letter-spacing: 0.5px;">En Yoğun Bölge</h6>
+                    <h2 id="statsBolge" class="fw-bold mb-0 text-warning text-dark" style="font-size: 1.4rem;">-</h2>
+                </div>
+                <div class="fs-1 text-warning opacity-50">📍</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0 mb-5">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle mb-0" id="taleplerTablosu">
+                <thead class="table-dark">
+                    <tr>
+                        <th class="ps-4">Başlık</th>
+                        <th>Açıklama</th>
+                        <th>Lokasyon</th>
+                        <th>Aciliyet Durumu</th>
+                        <th>Tarih</th>
+                        <th class="pe-4 text-end">İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="fw-bold ps-4">@Html.DisplayFor(modelItem => item.Baslik)</td>
+                            <td>@Html.DisplayFor(modelItem => item.Aciklama)</td>
+                            <td class="data-lokasyon">@Html.DisplayFor(modelItem => item.Lokasyon)</td>
+                            <td>
+                                @if (item.Derecesi.ToString() == "Kritik")
+                                {
+                                    <span class="badge bg-danger rounded-pill px-3 py-2 fw-bold data-derece">🚨 Kritik</span>
+                                }
+                                else if (item.Derecesi.ToString() == "Yuksek")
+                                {
+                                    <span class="badge bg-warning text-dark rounded-pill px-3 py-2 fw-bold data-derece">⚠️ Yüksek</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-info text-dark rounded-pill px-3 py-2 fw-bold data-derece">ℹ️ @item.Derecesi</span>
+                                }
+                            </td>
+                            <td><small class="text-muted">@item.OlusturulmaTarihi.ToString("dd.MM.yyyy HH:mm")</small></td>
+                            <td class="pe-4 text-end">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary rounded-pill px-3 me-1">Düzenle</a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger rounded-pill px-3">Sil</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var rows = document.querySelectorAll("#taleplerTablosu tbody tr");
+        var toplamTalep = rows.length;
+        var kritikTalep = 0;
+        var bolgeler = {};
+
+        rows.forEach(function (row) {
+            // Kritik sayısını hesapla
+            var dereceSpan = row.querySelector(".data-derece");
+            if (dereceSpan && dereceSpan.innerText.includes("Kritik")) {
+                kritikTalep++;
+            }
+
+            // En çok ihbar gelen şehri bul
+            var lokasyonTd = row.querySelector(".data-lokasyon");
+            if (lokasyonTd) {
+                var metin = lokasyonTd.innerText.trim().split(/[ ,/]+/)[0]; // İlk kelimeyi (Şehri) al
+                if(metin.length > 2) {
+                    bolgeler[metin] = (bolgeler[metin] || 0) + 1;
+                }
+            }
+        });
+
+        // En yoğun bölgeyi bulma algoritması
+        var enYogunBolge = "-";
+        var maxSayi = 0;
+        for (var b in bolgeler) {
+            if (bolgeler[b] > maxSayi) {
+                maxSayi = bolgeler[b];
+                enYogunBolge = b;
+            }
+        }
+
+        // HTML elementlerine sayıları yazdır
+        document.getElementById("statsToplam").innerText = toplamTalep;
+        document.getElementById("statsKritik").innerText = kritikTalep;
+        document.getElementById("statsBolge").innerText = enYogunBolge + " (" + maxSayi + ")";
+    });
+</script>

@@ -1,0 +1,121 @@
+﻿@model karaaslanlar1.Models.AfetTalebi
+@{
+    ViewData["Title"] = "Yeni İhtiyaç Bildir";
+}
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8">
+        <div id="formCard" class="card shadow-lg border-0" style="transition: all 0.4s ease;">
+            <div id="cardHeader" class="card-header bg-danger text-white py-3" style="transition: all 0.4s ease;">
+                <h4 class="mb-0 fw-bold">🚨 Acil Durum İhtiyaç Bildirim Formu</h4>
+            </div>
+            <div class="card-body p-4">
+                <div id="aiAlert" class="alert alert-danger d-none align-items-center rounded-3 mb-4 border-0 shadow-sm" style="background-color: #fef2f2; color: #991b1b;">
+                    <span class="fs-4 me-2">🤖</span>
+                    <div>
+                        <strong>AI Karar Destek Sistemi:</strong> Metin analizi sonucunda yüksek hayati risk/öncelik tespit edildi. Aciliyet durumu otomatik olarak <strong>Kritik</strong> olarak güncellendi.
+                    </div>
+                </div>
+
+                <form asp-action="Create">
+                    <div class="form-group mb-3">
+                        <label asp-for="Turu" class="control-label fw-bold text-muted mb-1"></label>
+                        <select asp-for="Turu" id="Turu" class="form-select form-select-lg rounded-3 fw-bold" asp-items="Html.GetEnumSelectList<karaaslanlar1.Models.AfetTuru>()"></select>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Baslik" class="control-label fw-bold text-muted mb-1"></label>
+                        <input asp-for="Baslik" id="Baslik" class="form-control form-control-lg rounded-3" placeholder="Örn: Kışlık Çadır ve Isıtıcı İhtiyacı" />
+                        <span asp-validation-for="Baslik" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Aciklama" class="control-label fw-bold text-muted mb-1">Açıklama (AI Canlı Analiz Desteği Açık)</label>
+                        <textarea asp-for="Aciklama" id="Aciklama" class="form-control rounded-3" rows="3" placeholder="İhtiyaç detaylarını ve durumun aciliyetini yazınız..." oninput="aiMetinAnalizi()"></textarea>
+                        <span asp-validation-for="Aciklama" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Lokasyon" class="control-label fw-bold text-muted mb-1"></label>
+                        <input asp-for="Lokasyon" id="Lokasyon" class="form-control rounded-3" placeholder="İl, İlçe veya Açık Adres Girişi" />
+                        <span asp-validation-for="Lokasyon" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label asp-for="Derecesi" class="control-label fw-bold text-muted mb-1"></label>
+                        <select asp-for="Derecesi" id="Derecesi" class="form-select form-select-lg rounded-3 text-danger fw-bold" asp-items="Html.GetEnumSelectList<karaaslanlar1.Models.Aciliyet>()"></select>
+                    </div>
+
+                    <div class="form-group d-grid gap-2">
+                        <button type="submit" class="btn btn-danger btn-lg rounded-pill shadow-sm fw-bold py-2.5">Afet Talebini Veritabanına İşle</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill py-2">Panoya Geri Dön</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function aiMetinAnalizi() {
+        var metin = document.getElementById("Aciklama").value.toLowerCase();
+
+        // Hayati tehlike arz eden kritik anahtar kelimeler
+        var kritikKelimeler = ["enkaz", "ses geliyor", "nefes", "mahsur", "göçük", "kanama", "yaralı", "boğulma", "yangın büyüdü", "acil kurtarma", "bebek var"];
+
+        var riskTespitEdildi = false;
+
+        for (var i = 0; i < kritikKelimeler.length; i++) {
+            if (metin.includes(kritikKelimeler[i])) {
+                riskTespitEdildi = true;
+                break;
+            }
+        }
+
+        var card = document.getElementById("formCard");
+        var header = document.getElementById("cardHeader");
+        var alertBox = document.getElementById("aiAlert");
+        var dereceSelect = document.getElementById("Derecesi");
+
+        if (riskTespitEdildi) {
+            // Formu agresif kırmızı yap ve AI uyarısını göster
+            alertBox.classList.remove("d-none");
+            card.style.boxShadow = "0 20px 40px rgba(225, 29, 72, 0.2)";
+            dereceSelect.value = "0"; // Otomatik olarak "Kritik" yap (C#'taki enum sırasına göre 0 Kritiktir)
+
+            // Gece modunda değilsek kartın etrafına hafif kırmızı ton ver
+            if(!document.body.classList.contains("dark-mode")) {
+                 card.style.backgroundColor = "#fffdfd";
+            }
+        } else {
+            // Normale döndür
+            alertBox.classList.add("d-none");
+            card.style.boxShadow = "";
+            if(!document.body.classList.contains("dark-mode")) {
+                card.style.backgroundColor = "#ffffff";
+            }
+        }
+    }
+
+    window.onload = function() {
+        var urlParametreleri = new URLSearchParams(window.location.search);
+        var gelenKonum = urlParametreleri.get('gelenKonum');
+        var afetTuru = urlParametreleri.get('afetTuru');
+        if (gelenKonum != null) {
+            document.getElementById('Lokasyon').value = gelenKonum;
+            document.getElementById('Derecesi').value = "0";
+            if(afetTuru === 'Deprem') {
+                document.getElementById('Turu').value = "0";
+                document.getElementById('Baslik').value = "⚠️ Deprem Sonrası Acil Lojistik Desteği";
+            } else if(afetTuru === 'Yangin') {
+                document.getElementById('Turu').value = "1";
+                document.getElementById('Baslik').value = "🔥 Yangın Bölgesi Acil Söndürme/Tahliye Talebi";
+            } else if(afetTuru === 'Sel') {
+                document.getElementById('Turu').value = "2";
+                document.getElementById('Baslik').value = "🌊 Sel Bölgesi Acil Tahliye ve Bot Desteği";
+            }
+            // Haritadan direkt butonla gelindiyse analizi tetikle
+            aiMetinAnalizi();
+        }
+    };
+</script>

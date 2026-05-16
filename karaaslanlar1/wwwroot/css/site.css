@@ -1,0 +1,145 @@
+/* --- GENEL TASARIM AYARLARI --- */
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: #f4f6f9;
+    color: #1a1f2c;
+    transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Yumuþak ve Profesyonel Kartlar */
+.card {
+    border: none !important;
+    border-radius: 20px !important;
+    background-color: #ffffff;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.4s ease;
+}
+
+body:not(.dark-mode) .card {
+    box-shadow: 0 10px 30px rgba(26, 31, 44, 0.04) !important;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+body:not(.dark-mode) .card:hover {
+    box-shadow: 0 20px 40px rgba(26, 31, 44, 0.08) !important;
+}
+
+/* Sayfa Baþlýklarý */
+.section-title {
+    font-weight: 800;
+    letter-spacing: -1px;
+    color: #1a1f2c;
+}
+
+/* Profesyonel Butonlar */
+.btn-premium-danger {
+    background: #e11d48;
+    color: white;
+    border: none;
+    transition: all 0.2s ease;
+}
+
+    .btn-premium-danger:hover {
+        background: #be123c;
+        color: white;
+        transform: scale(1.02);
+    }
+
+.btn-premium-success {
+    background: #10b981;
+    color: white;
+    border: none;
+    transition: all 0.2s ease;
+}
+
+    .btn-premium-success:hover {
+        background: #047857;
+        color: white;
+        transform: scale(1.02);
+    }
+
+/* Harita Kutusu */
+#turkiyeHaritasi {
+    height: 530px;
+    width: 100%;
+    border-radius: 0 0 20px 20px;
+}
+
+/* --- ULTRA PREMIUM VE YÜKSEK KONTRASTLI KARANLIK MOD AYARLARI --- */
+body.dark-mode {
+    background-color: #0b0f19 !important;
+    color: #f8fafc !important; /* Genel gövde yazýsý daha parlak beyaz/gri yapýldý */
+}
+
+    /* Karanlýk modda tüm text-muted (gri kalan) yazýlarý canlandýrýyoruz */
+    body.dark-mode .text-muted {
+        color: #cbd5e1 !important; /* Silik gri yerine net okunabilir açýk gri */
+    }
+
+    body.dark-mode .section-title {
+        color: #ffffff !important;
+    }
+
+    /* Kartlarýn Ýç Yapýsý */
+    body.dark-mode .card {
+        background-color: #131c2e !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
+    }
+
+    body.dark-mode .card-header {
+        background-color: #1a263e !important;
+        color: #ffffff !important;
+        border-bottom: 1px solid #243454 !important;
+    }
+
+    body.dark-mode .card-footer,
+    body.dark-mode .footer {
+        background-color: #0e1524 !important;
+        color: #cbd5e1 !important;
+        border-top: 1px solid #1a263e !important;
+    }
+
+    /* Form Elemanlarý ve Görünmeyen Etiketler (Form Labels) */
+    body.dark-mode .form-group label,
+    body.dark-mode form label,
+    body.dark-mode .control-label {
+        color: #ffffff !important; /* Form baþlýklarý tamamen beyaz yapýldý */
+    }
+
+    body.dark-mode .form-control,
+    body.dark-mode .form-select {
+        background-color: #1a263e !important;
+        border-color: #334155 !important; /* Kenarlýklar daha belirgin yapýldý */
+        color: #ffffff !important;
+    }
+
+        body.dark-mode .form-control::placeholder {
+            color: #94a3b8 !important; /* Ýpucu yazýlarý okunabilir yapýldý */
+        }
+
+        body.dark-mode .form-control:focus,
+        body.dark-mode .form-select:focus {
+            background-color: #1f2d4a !important;
+            border-color: #3b82f6 !important;
+        }
+
+    /* Tablolarýn Karanlýk Modda Okunabilirliði */
+    body.dark-mode .table {
+        color: #f8fafc !important;
+        border-color: #243454 !important;
+    }
+
+        body.dark-mode .table th,
+        body.dark-mode .table td {
+            color: #f8fafc !important; /* Tablo içindeki tüm yazýlar parlak */
+        }
+
+    body.dark-mode .table-striped > tbody > tr:nth-of-type(odd) {
+        background-color: rgba(255, 255, 255, 0.02) !important;
+    }
+
+    body.dark-mode .table-hover > tbody > tr:hover {
+        background-color: rgba(255, 255, 255, 0.06) !important;
+    }
