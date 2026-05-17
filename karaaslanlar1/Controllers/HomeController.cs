@@ -1,8 +1,8 @@
-using System.Diagnostics;
+ï»¿using System.Diagnostics;
 using karaaslanlar1.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http; // SESSION KONTROLÜ İÇİN ŞART KANKA
-
+using Microsoft.AspNetCore.Http; // SESSION KONTROLÃœ Ä°Ã‡Ä°N ÅART KANKA
+using Microsoft.Extensions.Logging;
 namespace karaaslanlar1.Controllers
 {
     public class HomeController : Controller
@@ -19,21 +19,21 @@ namespace karaaslanlar1.Controllers
             return View();
         }
 
-        // --- YENİ EKLENEN ROL VE GİRİŞ SİSTEMİ METOTLARI ---
+        // --- YENÄ° EKLENEN ROL VE GÄ°RÄ°Å SÄ°STEMÄ° METOTLARI ---
 
-        // 1. Giriş Simülasyonu (Post): Formdan gelen mail ve şifreye göre rol dağıtır
+        // 1. GiriÅŸ SimÃ¼lasyonu (Post): Formdan gelen mail ve ÅŸifreye gÃ¶re rol daÄŸÄ±tÄ±r
         [HttpPost]
         public IActionResult Login(string email, string sifre)
         {
             if (email == "admin@afet.com" && sifre == "123456")
             {
-                // Giriş yapan admin ise hafızaya Admin rolünü işle ve yönlendir
+                // GiriÅŸ yapan admin ise hafÄ±zaya Admin rolÃ¼nÃ¼ iÅŸle ve yÃ¶nlendir
                 HttpContext.Session.SetString("KullaniciRolu", "Admin");
                 return RedirectToAction("AdminDashboard");
             }
             else
             {
-                // Normal kullanıcı/vatandaş ise Kullanici rolünü işle ve ana sayfaya at
+                // Normal kullanÄ±cÄ±/vatandaÅŸ ise Kullanici rolÃ¼nÃ¼ iÅŸle ve ana sayfaya at
                 HttpContext.Session.SetString("KullaniciRolu", "Kullanici");
                 return RedirectToAction("Index");
             }
@@ -42,23 +42,23 @@ namespace karaaslanlar1.Controllers
         // 2. Admin Komuta Merkezi (Dashboard)
         public IActionResult AdminDashboard()
         {
-            // GÜVENLİK DUVARI: Eğer session'da Admin rolü yoksa, URL'den sızmaya çalışanları ana sayfaya şutla
+            // GÃœVENLÄ°K DUVARI: EÄŸer session'da Admin rolÃ¼ yoksa, URL'den sÄ±zmaya Ã§alÄ±ÅŸanlarÄ± ana sayfaya ÅŸutla
             if (HttpContext.Session.GetString("KullaniciRolu") != "Admin")
             {
                 return RedirectToAction("Index");
             }
 
-            return View(); // Views/Home/AdminDashboard.cshtml sayfasını açar
+            return View(); // Views/Home/AdminDashboard.cshtml sayfasÄ±nÄ± aÃ§ar
         }
 
-        // 3. Güvenli Çıkış (Logout): Rolleri temizler ve ana sayfaya döner
+        // 3. GÃ¼venli Ã‡Ä±kÄ±ÅŸ (Logout): Rolleri temizler ve ana sayfaya dÃ¶ner
         public IActionResult Logout()
         {
-            HttpContext.Session.Clear(); // Tüm session verilerini sıfırlar
+            HttpContext.Session.Clear(); // TÃ¼m session verilerini sÄ±fÄ±rlar
             return RedirectToAction("Index");
         }
 
-        // --- MEVCUT DİĞER SİSTEM METOTLARI ---
+        // --- MEVCUT DÄ°ÄER SÄ°STEM METOTLARI ---
 
         public IActionResult Privacy()
         {
@@ -70,5 +70,45 @@ namespace karaaslanlar1.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+        public IActionResult Sunum()
+        {
+            return View();
+        }
+        // Controllers/HomeController.cs iÃ§ine eklenecek loglama motoru:
+
+        [HttpPost]
+        public IActionResult SiberLogYaz([FromBody] CyberLogModel model)
+        {
+            if (model == null) return BadRequest();
+
+            // ğŸ“Ÿ MODEL DURUMUNA GÃ–RE KESTREL SÄ°YAH EKRANINA RENKLÄ° LOG BASIYORUZ KANKA
+            if (model.status == "ATTACK")
+            {
+                // SaldÄ±rÄ± anÄ±nda ekrana kÄ±rmÄ±zÄ± uyarÄ±lar dÃ¼ÅŸer
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"warn: AfetKomuta.Network.Firewall[403] | TEHDÄ°T ALGILANDI | Kaynak IP: {model.ip} -> AnlÄ±k YÃ¼k: {model.load} req/sn");
+            }
+            else if (model.status == "SHIELD_ACTIVE")
+            {
+                // Savunma kilitlendiÄŸinde ekrana devasa yeÅŸil kalkan logu basar
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("\n=================================================================================");
+                Console.WriteLine("info: AfetKomuta.Network.Security[200] | ğŸ›¡ï¸ OTONOM RATE LIMITING AKTÄ°F!");
+                Console.WriteLine("info: Sunucu network ÅŸebekesi koruma altÄ±na alÄ±ndÄ±. ZararlÄ± IP bloklarÄ± banlandÄ±.");
+                Console.WriteLine("=================================================================================\n");
+            }
+
+            Console.ResetColor(); // Konsol rengini orijinal haline geri dÃ¶ndÃ¼rÃ¼r kanka
+            return Ok(new { success = true });
+        }
+
+        // JSON verisini karÅŸÄ±lamak iÃ§in gerekli yardÄ±mcÄ± nesne sÄ±nÄ±fÄ±
+        public class CyberLogModel
+        {
+            public string ip { get; set; }
+            public int load { get; set; }
+            public string status { get; set; }
+        }
+
     }
 }

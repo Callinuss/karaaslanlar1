@@ -2,25 +2,128 @@
     ViewData["Title"] = "Admin Komuta Merkezi";
 }
 
-<div class="alert alert-danger rounded-3 shadow-sm border-0 mt-4 d-flex align-items-center justify-content-between p-3" style="background-color: #fef2f2; color: #991b1b;">
+<style>
+    .hover-lift {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .hover-lift:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 1.5rem 3rem rgba(0,0,0,0.2) !important;
+        }
+
+    .admin-banner {
+        background: linear-gradient(135deg, #2c0b0e 0%, #1a0809 100%);
+        border: 1px solid rgba(220, 53, 69, 0.2);
+        border-left: 6px solid #dc3545;
+        box-shadow: 0 8px 20px rgba(220, 53, 69, 0.15);
+        transition: all 0.5s ease-in-out;
+    }
+    /* 🛡️ YENİ: SİBER SALDIRI ANINDA BANNER'I KAPLAYACAK KIRMIZI NEON TEHDİT EFEKTİ */
+    .admin-banner-cyber-active {
+        background: linear-gradient(135deg, #4a0005 0%, #2b0003 100%) !important;
+        border: 2px solid #ffc107 !important;
+        border-left: 8px solid #ffc107 !important;
+        box-shadow: 0 0 30px rgba(255, 193, 7, 0.4) !important;
+    }
+
+    .kpi-panel {
+        background: linear-gradient(145deg, #1a1d20 0%, #212529 100%);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .status-dot {
+        width: 10px;
+        height: 10px;
+        display: inline-block;
+    }
+
+    .cyber-log-container {
+        max-height: 120px;
+        overflow-y: auto;
+        font-family: 'Courier New', Courier, monospace;
+        background-color: #0d1117;
+        color: #39ff14;
+        border: 1px solid #343a40;
+    }
+</style>
+
+<div id="adminMainBanner" class="alert admin-banner rounded-4 mt-4 d-flex align-items-center justify-content-between p-4 text-white">
     <div class="d-flex align-items-center">
-        <span class="fs-4 me-3">⚙️</span>
+        <div class="bg-danger bg-opacity-25 p-3 rounded-circle me-4 border border-danger border-opacity-50 shadow-sm d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#dc3545" class="bi bi-shield-lock-fill" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M8 0c-.69 0-1.843.265-2.928.56-1.11.3-2.229.655-2.887.87a1.54 1.54 0 0 0-1.044 1.262c-.596 4.477.787 7.795 2.465 9.99a11.777 11.777 0 0 0 2.517 2.453c.386.198.811.314 1.22.314s.834-.116 1.22-.314a11.777 11.777 0 0 0 2.517-2.453c1.678-2.195 3.061-5.513 2.465-9.99a1.54 1.54 0 0 0-1.044-1.263C10.228 1.215 9.11 .86 8 0zm0 5a1.5 1.5 0 0 1 1.5 1.5v.5h.5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-4a.5.5 0 0 1-.5-.5v-3a.5.5 0 0 1 .5-.5h.5v-.5A1.5 1.5 0 0 1 8 5zm1 2.5v-.5a1 1 0 0 0-2 0v.5h2z" />
+            </svg>
+        </div>
         <div>
-            <h5 class="alert-heading fw-bold mb-0">Merkez Komuta Yetkili Paneli</h5>
-            <p class="mb-0 small opacity-75">Sistem şu an tam yetkili modda çalışıyor. Tüm operasyonel lojistik talepleri ve sivil gönüllü listeleri erişiminize açıktır.</p>
+            <h4 id="adminBannerBaslik" class="fw-bolder mb-1 text-danger" style="letter-spacing: 0.5px;">Merkez Komuta Yetkili Paneli</h4>
+            <p id="adminBannerAltYazi" class="mb-0 text-white-50" style="font-size: 0.95rem;">Sistem şu an tam yetkili modda çalışıyor. Tüm operasyonel lojistik talepleri ve sivil gönüllü listeleri erişiminize açıktır.</p>
         </div>
     </div>
-    <span class="badge bg-danger rounded-pill px-3 py-2 fw-bold animate-pulse">CANLI TAKİP AKTİF</span>
+
+    <div class="d-flex align-items-center gap-3">
+        <button id="btnSiberSaldiri" class="btn btn-outline-warning rounded-pill fw-bold px-3 py-2 d-flex align-items-center shadow-sm" onclick="siberSaldiriTetikle()" style="border: 2px solid #ffc107; color: #ffc107; font-size: 0.85rem;">
+            <span class="me-2">⚡</span> Siber Savunma Testi
+        </button>
+
+        <span id="sistemDurumRozetiYukari" class="badge bg-danger rounded-pill px-4 py-2 fw-bold border border-light border-opacity-25 shadow-sm" style="font-size: 0.9rem;">
+            <span class="spinner-grow spinner-grow-sm me-2" role="status"></span>SİSTEM AKTİF
+        </span>
+    </div>
 </div>
 
-<div class="row mt-4 mb-5">
+<div class="row mt-4 mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 kpi-panel text-white p-4 rounded-4 shadow-sm border-start border-danger border-5 hover-lift">
+            <h6 class="text-white-50 small fw-bold text-uppercase mb-2 d-flex align-items-center" style="letter-spacing: 0.5px;">
+                <span class="spinner-grow text-danger status-dot me-2"></span> BEKLEYEN KRİTİK İHBAR
+            </h6>
+            <h2 id="kpiBekleyen" class="fw-bolder text-danger my-1">19</h2>
+            <span class="small text-muted">AI Triyajı Tarafından Onaylanan</span>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 kpi-panel text-white p-4 rounded-4 shadow-sm border-start border-success border-5 hover-lift">
+            <h6 class="text-white-50 small fw-bold text-uppercase mb-2 d-flex align-items-center" style="letter-spacing: 0.5px;">
+                <span class="spinner-grow text-success status-dot me-2"></span> AKTİF SAHADAKİ GÜÇ
+            </h6>
+            <h2 class="fw-bolder text-success my-1">142 <span class="fs-6 fw-normal text-white-50">Personel</span></h2>
+            <span class="small text-muted">Onaylı Gönüllü ve Ekipler</span>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 kpi-panel text-white p-4 rounded-4 shadow-sm border-start border-warning border-5 hover-lift">
+            <h6 class="text-white-50 small fw-bold text-uppercase mb-2 d-flex align-items-center" style="letter-spacing: 0.5px;">
+                <span class="spinner-grow text-warning status-dot me-2"></span> AKTİF AFET ODAKLARI
+            </h6>
+            <h2 id="kpiOdak" class="fw-bolder text-warning my-1">17</h2>
+            <span class="small text-muted">Deprem, Yangın ve Sel Total</span>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 kpi-panel text-white p-4 rounded-4 shadow-sm border-start border-info border-5 hover-lift" id="kpiIotKutusu" style="transition: all 0.3s ease;">
+            <h6 class="text-white-50 small fw-bold text-uppercase mb-2 d-flex align-items-center" style="letter-spacing: 0.5px;">
+                <span class="spinner-grow text-info status-dot me-2" id="kpiIotDot"></span> IOT ŞEBEKE GÜVENLİĞİ
+            </h6>
+            <h2 id="kpiIotDurum" class="fw-bolder text-info my-1">GÜVENLİ</h2>
+            <span id="kpiIotAlt" class="small text-muted">Hatlarda Akış Aktif</span>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-2 mb-5">
     <div class="col-12">
-        <div class="card shadow-lg border-0">
-            <div class="card-header bg-dark text-white py-3 px-4">
-                <h5 class="mb-0 fw-bold">🚨 Komuta Merkezi Kriz ve Lojistik Analiz Ekranı</h5>
-            </div>
+        <div class="card shadow-lg border-0 p-0 rounded-4 overflow-hidden hover-lift">
             <div class="card-body p-0">
                 @await Html.PartialAsync("~/Views/Home/Index.cshtml")
+
+                <div id="cyberLogPanel" class="cyber-log-container p-3 d-none">
+                    <div class="d-flex justify-content-between align-items-center border-bottom border-secondary pb-1 mb-2">
+                        <span class="fw-bold text-uppercase small text-warning" id="cyberPanelStatus">🛡️ Otonom Güvenlik Duvarı (Firewall) Aktif</span>
+                        <span class="badge bg-danger px-2 py-1 font-monospace" id="cyberRequestCounter" style="font-size: 0.75rem;">Yük: 0 req/sn</span>
+                    </div>
+                    <div id="cyberLogContent" class="small font-monospace" style="font-size: 0.8rem; height: 60px; overflow-y: auto;"></div>
+                </div>
             </div>
         </div>
     </div>

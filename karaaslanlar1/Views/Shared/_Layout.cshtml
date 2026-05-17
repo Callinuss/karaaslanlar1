@@ -6,16 +6,19 @@
     <title>@ViewData["Title"] - Afet Dayanışma Ağı</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-md navbar-dark sticky-top px-4 py-3 shadow-sm"
-             style="background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+        <nav class="navbar navbar-expand-md navbar-dark sticky-top px-4 py-3 shadow"
+             style="background: #111827 !important; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
             <div class="container-fluid">
-                <a class="navbar-brand fw-bold d-flex align-items-center fs-4" asp-area="" asp-controller="Home" asp-action="Index" style="letter-spacing: -0.5px;">
-                    <span class="d-inline-block rounded-circle bg-danger me-2 shadow" style="width: 10px; height: 10px; animation: logoPulse 1.5s infinite;"></span>
+
+                <a class="navbar-brand fw-bold d-flex align-items-center fs-4" asp-area="" asp-controller="Home" asp-action="Index" style="letter-spacing: -0.5px; color: #ffffff !important;">
+                    <span id="logoDotAnim" class="d-inline-block rounded-circle bg-danger me-2 shadow" style="width: 10px; height: 10px;"></span>
                     <span class="text-white fw-extrabold">Afet</span><span class="text-danger ms-1 fw-light">Dayanışma</span>
                 </a>
+
                 <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -23,33 +26,43 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav me-auto mb-2 mb-md-0 ms-md-4 gap-2">
                         <li class="nav-item">
-                            <a class="nav-link text-white-50 opacity-hover px-3 rounded-pill fw-medium" href="/Home/Index#afetHaritasiKapsayici">🗺️ Canlı Harita</a>
+                            <a class="nav-link text-white opacity-hover px-3 rounded-pill fw-semibold d-flex align-items-center gap-2" href="/Home/Index#afetHaritasiKapsayici" style="color: #ffffff !important;">
+                                <i class="bi bi-map"></i> Canlı Harita
+                            </a>
                         </li>
 
                         @if (Context.Session.GetString("KullaniciRolu") != "Admin")
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-white bg-danger bg-opacity-25 text-danger border border-danger border-opacity-25 px-3 rounded-pill fw-bold shadow-sm"
-                                   asp-area="" asp-controller="AfetTalepleri" asp-action="Create">🚨 İhtiyaç Bildir</a>
+                                <a class="nav-link text-white bg-danger bg-opacity-25 text-danger border border-danger px-3 rounded-pill fw-bold shadow-sm d-flex align-items-center gap-2"
+                                   asp-area="" asp-controller="AfetTalepleri" asp-action="Create" style="border: 1px solid #dc3545 !important; color: #dc3545 !important;">
+                                    <i class="bi bi-bell"></i> İhtiyaç Bildir
+                                </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-white-50 opacity-hover px-3 rounded-pill fw-medium"
-                                   asp-controller="Gonullu" asp-action="Create">🙋‍♂️ Gönüllü Ol</a>
+                                <a class="nav-link text-white opacity-hover px-3 rounded-pill fw-semibold d-flex align-items-center gap-2"
+                                   asp-controller="Gonullu" asp-action="Create" style="color: #ffffff !important;">
+                                    <i class="bi bi-person-check"></i> Gönüllü Ol
+                                </a>
                             </li>
                         }
 
                         @if (Context.Session.GetString("KullaniciRolu") == "Admin")
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-white bg-warning bg-opacity-25 text-warning border border-warning border-opacity-25 px-3 rounded-pill fw-bold shadow-sm"
-                                   asp-area="" asp-controller="AfetTalepleri" asp-action="Index">📋 Gelen İhtiyaç Talepleri</a>
+                                <a class="nav-link text-white bg-secondary bg-opacity-50 border border-secondary px-3 rounded-pill fw-bold shadow-sm d-flex align-items-center gap-2"
+                                   asp-area="" asp-controller="AfetTalepleri" asp-action="Index" style="color: #ffffff !important;">
+                                    <i class="bi bi-file-earmark-text"></i> Gelen Talepler
+                                </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-white-50 opacity-hover px-3 rounded-pill fw-medium"
-                                   asp-controller="Gonullu" asp-action="Index">👥 Gönüllü Başvurularını Yönet</a>
+                                <a class="nav-link text-white opacity-hover px-3 rounded-pill fw-semibold d-flex align-items-center gap-2"
+                                   asp-controller="Gonullu" asp-action="Index" style="color: #ffffff !important;">
+                                    <i class="bi bi-people"></i> Başvuruları Yönet
+                                </a>
                             </li>
                             <li class="nav-item d-flex align-items-center">
-                                <span class="badge bg-primary rounded-pill px-3 py-2 ms-2 fw-bold" style="font-size:0.8rem;">⚙️ Merkez Komuta Yetkilisi</span>
+                                <span class="badge bg-dark text-danger border border-danger rounded-pill px-3 py-2 ms-2 fw-bold font-monospace" style="font-size:0.75rem; letter-spacing: 0.5px;">SYS_HQ_ROOT</span>
                             </li>
                         }
                     </ul>
@@ -57,13 +70,15 @@
                     <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
                         @if (Context.Session.GetString("KullaniciRolu") == "Admin")
                         {
-                            <span class="text-white-50 small me-2">Hoş geldiniz, Admin</span>
-                            <a asp-controller="Home" asp-action="Logout" class="btn btn-outline-light rounded-pill btn-sm px-3 fw-bold">🚪 Güvenli Çıkış</a>
+                            <span class="text-white small me-2 font-monospace" style="color: #ffffff !important;">ROOT_USER</span>
+                            <a asp-controller="Home" asp-action="Logout" class="btn btn-outline-danger rounded-pill btn-sm px-3 fw-bold d-flex align-items-center gap-2">
+                                <i class="bi bi-door-open"></i> Güvenli Çıkış
+                            </a>
                         }
                         else
                         {
-                            <button type="button" class="btn btn-warning btn-sm rounded-pill px-4 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#loginModal" style="font-size: 0.85rem;">
-                                🔐 Admin Girişi
+                            <button type="button" class="btn btn-admin-cyber btn-sm rounded-pill px-4 fw-bold shadow-sm d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#loginModal" style="font-size: 0.85rem; height: 38px;">
+                                <i class="bi bi-key-fill"></i> Yetkili Girişi
                             </button>
                         }
                     </div>
@@ -76,7 +91,7 @@
         <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
             <div class="modal-content border-0 rounded-4 shadow-lg" style="background-color: #131c2e; color: #ffffff;">
                 <div class="modal-header border-0 pb-0 px-4 pt-4">
-                    <h5 class="modal-title fw-bold text-danger" id="loginModalLabel">🚨 Yetkili Personel Girişi</h5>
+                    <h5 class="modal-title fw-bold text-danger" id="loginModalLabel">Yetkili Personel Girişi</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" onclick="$('#loginModal').modal('hide')" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
@@ -87,7 +102,7 @@
                         </div>
                         <div class="mb-4">
                             <label class="form-label small fw-bold text-white-50">Güvenlik Şifresi</label>
-                            <input type="password" name="sifre" class="form-control rounded-3 bg-dark text-white border-secondary py-2" placeholder="123456" required />
+                            <input type="password" name="sifre" class="form-control rounded-3 bg-dark text-white border-secondary py-2" placeholder="••••••" required />
                         </div>
                         <button type="submit" class="btn btn-danger w-100 rounded-pill py-2.5 fw-bold shadow">Sistem Kimliğini Doğrula</button>
                     </form>
@@ -140,10 +155,33 @@
             }
         }
 
+        #logoDotAnim {
+            animation: logoPulse 1.5s infinite;
+        }
+
         .opacity-hover:hover {
             color: #ffffff !important;
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.15) !important;
         }
+
+        /* ASİL MAT SİBER-GRİ BUTON CSS AYARI */
+        .btn-admin-cyber {
+            background-color: rgba(255, 255, 255, 0.08) !important;
+            color: #ffffff !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            font-size: 0.8rem !important;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            transition: all 0.2s ease-in-out;
+        }
+
+            .btn-admin-cyber:hover {
+                background-color: rgba(255, 255, 255, 0.2) !important;
+                border-color: #0dcaf0 !important;
+                color: #0dcaf0 !important;
+                box-shadow: 0 0 10px rgba(13, 202, 240, 0.3);
+            }
 
         #themeToggleBtn:hover {
             transform: scale(1.1) rotate(15deg);
