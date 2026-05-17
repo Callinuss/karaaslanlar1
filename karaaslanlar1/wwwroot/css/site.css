@@ -1,186 +1,185 @@
-/* --- GENEL TASARIM AYARLARI --- */
+ï»¿/* =======================================================
+   GLOBAL ARKA PLAN
+======================================================= */
+
 body {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    background-color: #f4f6f9;
-    color: #1a1f2c;
-    transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Yumuþak ve Profesyonel Kartlar */
-.card {
-    border: none !important;
-    border-radius: 20px !important;
-    background-color: #ffffff;
-    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.4s ease;
-}
-
-body:not(.dark-mode) .card {
-    box-shadow: 0 10px 30px rgba(26, 31, 44, 0.04) !important;
-}
-
-.card:hover {
-    transform: translateY(-5px);
-}
-
-body:not(.dark-mode) .card:hover {
-    box-shadow: 0 20px 40px rgba(26, 31, 44, 0.08) !important;
-}
-
-/* Sayfa Baþlýklarý */
-.section-title {
-    font-weight: 800;
-    letter-spacing: -1px;
-    color: #1a1f2c;
-}
-
-/* Profesyonel Butonlar */
-.btn-premium-danger {
-    background: #e11d48;
-    color: white;
-    border: none;
-    transition: all 0.2s ease;
-}
-
-    .btn-premium-danger:hover {
-        background: #be123c;
-        color: white;
-        transform: scale(1.02);
-    }
-
-.btn-premium-success {
-    background: #10b981;
-    color: white;
-    border: none;
-    transition: all 0.2s ease;
-}
-
-    .btn-premium-success:hover {
-        background: #047857;
-        color: white;
-        transform: scale(1.02);
-    }
-
-/* Harita Kutusu */
-#turkiyeHaritasi {
-    height: 530px;
-    width: 100%;
-    border-radius: 0 0 20px 20px;
-}
-
-/* --- ULTRA PREMIUM VE YÜKSEK KONTRASTLI KARANLIK MOD AYARLARI --- */
-body.dark-mode {
-    background-color: #0b0f19 !important;
-    color: #f8fafc !important; /* Genel gövde yazýsý daha parlak beyaz/gri yapýldý */
-}
-
-    /* Karanlýk modda tüm text-muted (gri kalan) yazýlarý canlandýrýyoruz */
-    body.dark-mode .text-muted {
-        color: #cbd5e1 !important; /* Silik gri yerine net okunabilir açýk gri */
-    }
-
-    body.dark-mode .section-title {
-        color: #ffffff !important;
-    }
-
-    /* Kartlarýn Ýç Yapýsý */
-    body.dark-mode .card {
-        background-color: #131c2e !important;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
-    }
-
-    body.dark-mode .card-header {
-        background-color: #1a263e !important;
-        color: #ffffff !important;
-        border-bottom: 1px solid #243454 !important;
-    }
-
-    body.dark-mode .card-footer,
-    body.dark-mode .footer {
-        background-color: #0e1524 !important;
-        color: #cbd5e1 !important;
-        border-top: 1px solid #1a263e !important;
-    }
-
-    /* Form Elemanlarý ve Görünmeyen Etiketler (Form Labels) */
-    body.dark-mode .form-group label,
-    body.dark-mode form label,
-    body.dark-mode .control-label {
-        color: #ffffff !important; /* Form baþlýklarý tamamen beyaz yapýldý */
-    }
-
-    body.dark-mode .form-control,
-    body.dark-mode .form-select {
-        background-color: #1a263e !important;
-        border-color: #334155 !important; /* Kenarlýklar daha belirgin yapýldý */
-        color: #ffffff !important;
-    }
-
-        body.dark-mode .form-control::placeholder {
-            color: #94a3b8 !important; /* Ýpucu yazýlarý okunabilir yapýldý */
-        }
-
-        body.dark-mode .form-control:focus,
-        body.dark-mode .form-select:focus {
-            background-color: #1f2d4a !important;
-            border-color: #3b82f6 !important;
-        }
-
-    /* Tablolarýn Karanlýk Modda Okunabilirliði */
-    body.dark-mode .table {
-        color: #f8fafc !important;
-        border-color: #243454 !important;
-    }
-
-        body.dark-mode .table th,
-        body.dark-mode .table td {
-            color: #f8fafc !important; /* Tablo içindeki tüm yazýlar parlak */
-        }
-
-    body.dark-mode .table-striped > tbody > tr:nth-of-type(odd) {
-        background-color: rgba(255, 255, 255, 0.02) !important;
-    }
-
-    body.dark-mode .table-hover > tbody > tr:hover {
-        background-color: rgba(255, 255, 255, 0.06) !important;
-    }
-@keyframes logoPulse {
-
-    0% {
-        transform: scale(0.95);
-        box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.7);
-    }
-
-    70% {
-        transform: scale(1);
-        box-shadow: 0 0 0 8px rgba(225, 29, 72, 0);
-    }
-
-    100% {
-        transform: scale(0.95);
-        box-shadow: 0 0 0 0 rgba(225, 29, 72, 0);
-    }
-}
-
-.opacity-hover:hover {
+    font-family: 'Inter', sans-serif !important;
+    background: linear-gradient( rgba(7,12,24,0.72), rgba(7,12,24,0.78) ), url('/images/arka.jpeg') !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-attachment: fixed !important;
+    min-height: 100vh;
     color: #ffffff !important;
-    background: rgba(255, 255, 255, 0.08);
 }
 
-#themeToggleBtn:hover {
-    transform: scale(1.1) rotate(15deg);
+/* =======================================================
+   TÃœM YAZILARI BEYAZ YAP
+======================================================= */
+
+h1, h2, h3, h4, h5, h6,
+p, span, label,
+.table,
+.card,
+.modal-content,
+.nav-link,
+td, th {
+    color: #ffffff !important;
 }
 
-body:not(.dark-mode) #themeToggleBtn {
-    background-color: #1e1e1e !important;
+/* =======================================================
+   NAVBAR
+======================================================= */
+
+.navbar {
+    background: rgba(10,15,30,0.82) !important;
+    backdrop-filter: blur(18px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    box-shadow: 0 10px 35px rgba(0,0,0,0.35);
 }
 
-body.dark-mode #themeToggleBtn {
-    background-color: #ffc107 !important;
-    border-color: #ffca28 !important;
-    color: #000000 !important;
+/* =======================================================
+   CAM EFEKTLÄ° KARTLAR
+======================================================= */
+
+.card {
+    background: rgba(19,28,46,0.72) !important;
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(255,255,255,0.08) !important;
+    border-radius: 22px !important;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.35);
+    transition: 0.3s ease;
 }
 
-.form-select option {
-    background-color: #131c2e;
-    color: #ffffff;
+    .card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 20px 45px rgba(0,0,0,0.45);
+    }
+
+/* =======================================================
+   FORM ELEMANLARI
+======================================================= */
+
+.form-control,
+.form-select {
+    background: rgba(255,255,255,0.06) !important;
+    border: 1px solid rgba(255,255,255,0.08) !important;
+    color: white !important;
+}
+
+    .form-control::placeholder {
+        color: rgba(255,255,255,0.55) !important;
+    }
+
+/* =======================================================
+   TABLOLAR
+======================================================= */
+
+.table {
+    color: white !important;
+    background: rgba(19,28,46,0.55);
+}
+
+    .table thead {
+        background: rgba(0,0,0,0.35);
+    }
+
+    .table td,
+    .table th {
+        border-color: rgba(255,255,255,0.08) !important;
+    }
+
+/* =======================================================
+   MODAL
+======================================================= */
+
+.modal-content {
+    background: rgba(19,28,46,0.92) !important;
+    backdrop-filter: blur(18px);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: white !important;
+}
+
+/* =======================================================
+   FOOTER
+======================================================= */
+
+.footer {
+    background: rgba(10,15,30,0.82) !important;
+    color: white !important;
+    border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+/* =======================================================
+   HERO YAZILARI
+======================================================= */
+
+.display-3,
+.display-4 {
+    color: #ffffff !important;
+    text-shadow: 0 5px 20px rgba(0,0,0,0.45);
+}
+
+/* =======================================================
+   BUTONLAR
+======================================================= */
+
+.btn-danger {
+    background: linear-gradient(135deg,#dc3545,#b91c1c) !important;
+    border: none !important;
+}
+
+.btn-success {
+    background: linear-gradient(135deg,#10b981,#047857) !important;
+    border: none !important;
+}
+/* ==========================================================================
+   ðŸš¨ AFET DAYANIÅžMA AÄžI - SÄ°BER SELECT METÄ°N OKUNMA DÃœZELTMESÄ°
+   ========================================================================== */
+
+html {
+    color-scheme: dark !important;
+}
+
+/* Sitedeki tÃ¼m select, input ve textarea elemanlarÄ± iÃ§in siber gÃ¶rÃ¼nÃ¼m */
+select,
+.form-select,
+.form-select-lg,
+input.form-control,
+textarea.form-control {
+    background-color: #0f172a !important;
+    color: #ffffff !important; /* SeÃ§ilen metin rengi her zaman beyaz */
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    min-height: 45px !important; /* ðŸŽ¯ Kutunun daralÄ±p metni gizlemesini engeller kanka */
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+}
+
+    /* ðŸŽ¯ Ä°Ã‡Ä°NDEKÄ° SEÃ‡ENEKLERÄ°N (YAZILARIN) TARAYICIDA GÃ–RÃœNMESÄ°NÄ° GARANTÄ°LEYEN KISIM */
+    select option,
+    .form-select option {
+        background-color: #1e293b !important;
+        color: #ffffff !important; /* SeÃ§enek listesindeki yazÄ±larÄ± zorla beyaz yapar */
+        padding: 10px !important;
+    }
+
+    /* Odaklanma (Focus) ayarlarÄ± */
+    select:focus,
+    .form-select:focus,
+    input:focus,
+    textarea:focus {
+        background-color: #0f172a !important;
+        color: #ffffff !important;
+        box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
+        border-color: #dc3545 !important;
+    }
+
+/* KartlarÄ±n siber mod eÅŸitlemesi */
+.card,
+main .p-5,
+.main-search-panel {
+    background-color: #1e293b !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
 }

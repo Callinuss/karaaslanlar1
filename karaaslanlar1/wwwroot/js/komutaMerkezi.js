@@ -32,7 +32,7 @@ var iotAlarmIcon = L.icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/
 var toplanmaIcon = L.icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png', shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34] });
 var karargahIcon = L.icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-black.png', shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34] });
 
-// 🔮 SAHA EKİPLERİ İÇİN ÖZEL MOR (VIOLET) İKON - Tüm kriz renklerinden tamamen ayrıştı!
+// 🔮 SAHA EKİPLERİ İÇİN ÖZEL MOR (VIOLET) İKON
 var canliSahaIkonu = L.icon({
     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-violet.png',
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -58,7 +58,7 @@ var koordinasyonMerkezleri = [
 var sehirKoordinatSözlugu = {
     gaziantep: { merkez: [37.0662, 37.3833], afad: { ad: "Gaziantep İl AFAD Müdürlüğü", enlem: 37.1421, boylam: 37.3881, adres: "Göktürk Mah. 150150. Cadde 44/B, Şehitkamil", tel: "0342 336 26 92" }, alan: { isim: "Şahinbey Parkı Toplanma Alanı", enlem: 37.0420, boylam: 37.3510, kapasite: "4.500 Kişi", imkanlar: "Çadır Sahası, Mobil Mutfak", adres: "Yeditepe Mah." } },
     hatay: { merkez: [36.2023, 36.1613], afad: { ad: "Hatay İl AFAD Yönetim Merkezi", enlem: 36.3682, boylam: 36.2251, adres: "Serinyol 20. Sk. No:1/1, Antakya", tel: "0326 233 20 20" }, alan: { isim: "Antakya Stadyumu Yanı Sahra Alanı", enlem: 36.2150, boylam: 36.1720, kapasite: "8.000 Kişi", imkanlar: "Sahra Hastanesi, İletişim", adres: "Saraykent Mah." } },
-    kahramanmaras: { merkez: [37.5744, 36.9372], afad: { ad: "K.Maraş İl AFAD Müdürlüğü", enlem: 37.5061, boylam: 36.9925, adres: "Karacasu Mamaraş, 84041. Sk. No: 41", tel: "0344 224 14 14" }, alan: { isim: "Atatürk Parkı Güvenli Bölge", enlem: 37.5680, boylam: 36.9290, kapasite: "6.000 Kişi", imkanlar: "Barınma Kapsülleri, Sahra WC", adres: "Fevzi Çakmak Mah." } },
+    kahramanmaras: { merkez: [37.5744, 36.9372], afad: { ad: "K.Maraş İl AFAD Müdürlüğü", enlem: 37.5061, boylam: 36.9925, adres: "Karacasu Mamaraş, 84041. Sk. No: 41", tel: "0344 224 14 14" }, alan: { isim: "Atatürk Parkı Güvenli Bölge", enlem: 37.5680, bodylam: 36.9290, kapasite: "6.000 Kişi", imkanlar: "Barınma Kapsülleri, Sahra WC", adres: "Fevzi Çakmak Mah." } },
     adiyaman: { merkez: [37.7639, 38.2778], afad: { ad: "Adıyaman İl AFAD Müdürlüğü", enlem: 37.7637, boylam: 38.2786, adres: "İmamağa, Atatürk Bulv. No:175", tel: "0416 216 12 31" }, alan: { isim: "Eğriçay Parkı Lojistik Merkezi", enlem: 37.7550, boylam: 38.2778, kapasite: "5.000 Kişi", imkanlar: "Su Depoları, Erzak Deposu", adres: "Sümerevler Mah." } },
     istanbul: { merkez: [41.0082, 28.9784], afad: { ad: "İstanbul AFAD Merkez Komuta", enlem: 41.0855, boylam: 28.8211, adres: "Bakırköy", tel: "0212 455 56 00" }, alan: { isim: "Maltepe Sahil Etkinlik Alanı", enlem: 40.9250, boylam: 29.1210, kapasite: "50.000 Kişi", imkanlar: "Tam Teşekküllü Lojistik", adres: "Sahil Şeridi" } },
     ankara: { merkez: [39.9334, 32.8597], afad: { ad: "Ankara AFAD Başkanlığı", enlem: 39.8970, boylam: 32.7410, adres: "Dumlupınar Bulvarı, Çankaya", tel: "0312 258 23 23" }, alan: { isim: "Atatürk Orman Çiftliği Sahası", enlem: 39.9410, boylam: 32.7950, kapasite: "30.000 Kişi", imkanlar: "Lojistik Merkez, Sahra Mutfak", adres: "Emniyet Mah." } },
@@ -88,7 +88,7 @@ function karargahlariGoster() {
     } else {
         karargahLayer.clearLayers();
         karargahAcikMi = false;
-        btn.innerHTML = "AFAD Merkezleri";
+        btn.innerHTML = "Koordinasyon Merkezleri";
         map.setView([39.0, 35.0], 6);
     }
 }
@@ -147,7 +147,6 @@ function canliGpsKonumunuBagla() {
             canliGpsLayer.clearLayers();
             var popContent = "<div style='width:240px; font-family:sans-serif;'><h6>Saha Komuta Ekibi</h6><p class='mb-1 small'><b>Personel:</b> Melih Karaaslan</p><p class='mb-1 small text-primary'><b>Sapma Oranı:</b> ±" + dogruluk + " m</p></div>";
 
-            // 🛠️ NET ÇÖZÜM: ARTIK SAF ASKERİ MOR (VIOLET) PİN DÜŞÜYOR
             var sahaMarkeri = L.marker([enlem, boylam], { icon: canliSahaIkonu }).bindPopup(popContent).addTo(canliGpsLayer);
 
             setTimeout(function () { sahaMarkeri.openPopup(); }, 2200);
@@ -232,7 +231,7 @@ function iotSarsintiTetikle(kaynak) {
         aktifIotMarkerlar.forEach(function (item) {
             var krizMarker = L.marker([item.data.enlem, item.data.boylam], { icon: iotAlarmIcon })
                 .addTo(iotLayer)
-                .bindPopup("<div class='p-1'><h6 class='text-danger fw-bold mb-1'>Alarm: " + kaynak + "</h6><p class='small mb-2'><b>İstasyon:</b> " + item.data.isim + "</p><div class='alert alert-danger py-1 px-2 small mb-0 fw-bold'>Şok Dalga Algılandı! Şebeke Güvenliği İçin Hat Kapatıldı.</div></div>");
+                .bindPopup("<div class='p-1'><h6 class='text-danger fw-bold mb-1'>Alarm: " + kaynak + "</h6><p class='small mb-2'><b>İstasyon:</b> " + item.data.isim + "</p><div class='alert alert-danger py-1 px-2 small mb-0 fw-bold'>Şok Dalgası Algılandı! Şebeke Güvenliği İçin Hat Kapatıldı.</div></div>");
             if (item.data.id === 1) { setTimeout(() => { krizMarker.openPopup(); }, 500); }
         });
     }, 1300);
@@ -281,7 +280,7 @@ function sistemiSifirla() {
     iotSensorleriniYukle();
     karargahLayer.clearLayers();
     karargahAcikMi = false;
-    if (document.getElementById("btnKarargah")) { btn.innerHTML = "AFAD Merkezleri"; }
+    if (document.getElementById("btnKarargah")) { btn.innerHTML = "Canlı Akustik Sensörü Başlat"; }
 }
 
 function afetVerileriniGetir() {
@@ -296,7 +295,7 @@ function afetVerileriniGetir() {
             for (var i = 0; i < data.result.length; i++) {
                 if (listelenenCount >= 5) break;
                 var deprem = data.result[i];
-                if (deprem.mag > 2.5) {
+                if (deprem.mag > 2) {
                     var aiScore = (deprem.mag * 1.8).toFixed(1);
                     if (aiScore > 10) aiScore = 10.0;
                     var badgeColor = aiScore > 7 ? 'danger' : 'warning';
@@ -306,6 +305,7 @@ function afetVerileriniGetir() {
                     if (temizSehirIsmi.includes("adiyaman")) hedefSehir = "adiyaman";
                     if (temizSehirIsmi.includes("maray") || temizSehirIsmi.includes("kahraman")) hedefSehir = "kahramanmaras";
 
+                    // 🛠️ PARENT / TOP SEVİYESİNDE YÖNLENDİRME YAPAN GÜVENLİ BUTON YAPISI
                     var popupHtml = "<div class='p-1' style='width:220px; font-family:sans-serif;'>" +
                         "<h6 class='text-warning fw-bold mb-1'>Deprem (M " + deprem.mag + ")</h6>" +
                         "<div class='badge bg-" + badgeColor + " text-white mb-2 py-1 px-2 w-100'>AI Öncelik Skoru: " + aiScore + "/10</div>" +
@@ -335,6 +335,11 @@ function afetVerileriniGetir() {
             "<button onclick=\"akilliEslesmeYap('" + (k.yer || k.konum) + "', '" + k.sehir + "', '" + k.uzmanlik + "')\" class='btn btn-sm btn-dark w-100 rounded-pill text-info fw-bold shadow-sm'>Gönüllü Eşleştir</button></div>";
         L.marker([k.lat, k.lng], { icon: k.icon }).bindPopup(pHtml).addTo(afetLayer);
     });
+}
+
+function acilEkipIste(lokasyon, afetTuru) {
+    // 🛡️ BÜTÜNSEL ÇÖZÜM: Partial View veya iframe alanlarından sıyrılıp ana pencereyi uçurur kanka
+    top.location.href = '/AfetTalepleri/Create?gelenKonum=' + encodeURIComponent(lokasyon) + '&afetTuru=' + afetTuru;
 }
 
 function akilliEslesmeYap(bölge, afetSehri, uzmanlikAlani) {
@@ -380,8 +385,6 @@ function sehreOdaklanVeToplanmaAlanlariniGetir() {
 }
 
 // SİBER EMÜLATÖR VE SAVUNMA MOTORU
-// wwwroot/js/komutaMerkezi.js içindeki siberSaldiriTetikle fonksiyonunun güncel hali:
-
 function siberSaldiriTetikle() {
     var btn = document.getElementById("btnSiberSaldiri");
     var logPanel = document.getElementById("cyberLogPanel");
@@ -420,7 +423,6 @@ function siberSaldiriTetikle() {
 
     var sanalIstekSayisi = 0;
 
-    // 🚀 EMÜLASYON DÖNGÜSÜ
     siberSaldiriZamanlayici = setInterval(function () {
         var artis = Math.floor(Math.random() * 250) + 150;
         sanalIstekSayisi += artis;
@@ -432,19 +434,15 @@ function siberSaldiriTetikle() {
             logContent.scrollTop = logContent.scrollHeight;
         }
 
-        // 🚨 KESTREL SİYAH EKRAN TETİKLEMESİ (GERÇEK AJAX İSTEĞİ)
-        // Her döngüde .NET sunucusuna arka arkaya asenkron paket fırlatıyoruz kanka!
         fetch('/Home/SiberLogYaz', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ ip: sahteIp, load: sanalIstekSayisi, status: "ATTACK" })
         }).catch(e => { });
 
-        // OTONOM SAVUNMA (RATE LIMITER MECHANISM)
         if (sanalIstekSayisi > 2500) {
             clearInterval(siberSaldiriZamanlayici);
 
-            // Sunucuya "SAVUNMA AKTİF, SALDIRI ENGELLENDİ" logu yolluyoruz kanka siyaha düşsün diye
             fetch('/Home/SiberLogYaz', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -465,5 +463,6 @@ function siberSaldiriTetikle() {
         }
     }, 150);
 }
+
 afetVerileriniGetir();
 iotSensorleriniYukle();
